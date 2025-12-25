@@ -4,8 +4,31 @@ services:
       context: .
       dockerfile: QuranSchool.API/Dockerfile
     ports:
-      - "5000:8080" # Map host port 5000 to container port 8080 (default for .NET 8/10 non-root)
+      - "5000:8080"
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=QuranSchool;Username=postgres;Password=postgres
+    depends_on:
+      postgres:
+        condition: service_healthy
     volumes:
-      - .:/src # Optional: Mount source for easier debugging if needed, though hot reload requires more setup
+      - .:/src
+
+  postgres:
+    image: postgres:17-alpine
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=QuranSchool
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:
