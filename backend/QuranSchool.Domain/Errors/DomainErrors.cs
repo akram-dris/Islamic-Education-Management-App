@@ -12,6 +12,7 @@ public static class DomainErrors
         public static readonly Error ParentNotFound = Error.NotFound("User.ParentNotFound", "Parent not found.");
         public static readonly Error StudentNotFound = Error.NotFound("User.StudentNotFound", "Student not found.");
         public static readonly Error TeacherNotFound = Error.NotFound("User.TeacherNotFound", "Teacher not found.");
+        public static readonly Error NotAuthorized = Error.Forbidden("User.NotAuthorized", "You are not authorized to perform this action.");
     }
 
     public static class Auth
@@ -45,6 +46,7 @@ public static class DomainErrors
     public static class Assignment
     {
         public static readonly Error NotFound = Error.NotFound("Assignment.NotFound", "Assignment not found.");
+        public static readonly Error PastDueDate = Error.Validation("Assignment.PastDueDate", "The submission deadline has passed.");
     }
 
     public static class Submission

@@ -1,4 +1,5 @@
 using MediatR;
+using QuranSchool.Application.Abstractions.Authentication;
 using QuranSchool.Application.Abstractions.Persistence;
 using QuranSchool.Domain.Abstractions;
 using QuranSchool.Domain.Entities;
@@ -10,13 +11,16 @@ public sealed class MarkAttendanceCommandHandler : IRequestHandler<MarkAttendanc
 {
     private readonly IAttendanceRepository _attendanceRepository;
     private readonly IAllocationRepository _allocationRepository;
+    private readonly IUserContext _userContext;
 
     public MarkAttendanceCommandHandler(
         IAttendanceRepository attendanceRepository,
-        IAllocationRepository allocationRepository)
+        IAllocationRepository allocationRepository,
+        IUserContext userContext)
     {
         _attendanceRepository = attendanceRepository;
         _allocationRepository = allocationRepository;
+        _userContext = userContext;
     }
 
     public async Task<Result> Handle(MarkAttendanceCommand request, CancellationToken cancellationToken)
@@ -25,6 +29,11 @@ public sealed class MarkAttendanceCommandHandler : IRequestHandler<MarkAttendanc
         if (allocation is null)
         {
             return Result.Failure(DomainErrors.Allocation.NotFound);
+        }
+
+        if (allocation.TeacherId != _userContext.UserId)
+        {
+            return Result.Failure(DomainErrors.User.NotAuthorized);
         }
 
         var session = await _attendanceRepository.GetSessionByAllocationAndDateAsync(request.AllocationId, request.Date, cancellationToken);

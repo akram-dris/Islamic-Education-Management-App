@@ -17,12 +17,13 @@ public sealed class DeleteUserCommandHandler : IRequestHandler<DeleteUserCommand
     public async Task<Result> Handle(DeleteUserCommand request, CancellationToken cancellationToken)
     {
         var user = await _userRepository.GetByIdAsync(request.UserId, cancellationToken);
-        if (user is null)
+        if (user is null || user.IsDeleted)
         {
             return Result.Failure(DomainErrors.User.NotFound);
         }
 
-        await _userRepository.DeleteAsync(user, cancellationToken);
+        user.IsDeleted = true;
+        await _userRepository.UpdateAsync(user, cancellationToken);
 
         return Result.Success();
     }

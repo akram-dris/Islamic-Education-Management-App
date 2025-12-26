@@ -1,5 +1,6 @@
 using MediatR;
 using Microsoft.Extensions.Caching.Memory;
+using QuranSchool.Application.Abstractions.Caching;
 using QuranSchool.Application.Abstractions.Persistence;
 using QuranSchool.Domain.Abstractions;
 
@@ -9,7 +10,6 @@ public sealed class GetAllClassesQueryHandler : IRequestHandler<GetAllClassesQue
 {
     private readonly IClassRepository _classRepository;
     private readonly IMemoryCache _cache;
-    private const string CacheKey = "classes";
 
     public GetAllClassesQueryHandler(IClassRepository classRepository, IMemoryCache cache)
     {
@@ -19,7 +19,7 @@ public sealed class GetAllClassesQueryHandler : IRequestHandler<GetAllClassesQue
 
     public async Task<Result<List<ClassResponse>>> Handle(GetAllClassesQuery request, CancellationToken cancellationToken)
     {
-        if (_cache.TryGetValue(CacheKey, out List<ClassResponse>? response) && response is not null)
+        if (_cache.TryGetValue(CacheKeys.Classes, out List<ClassResponse>? response) && response is not null)
         {
             return response;
         }
@@ -28,7 +28,7 @@ public sealed class GetAllClassesQueryHandler : IRequestHandler<GetAllClassesQue
 
         response = classes.Select(c => new ClassResponse(c.Id, c.Name)).ToList();
 
-        _cache.Set(CacheKey, response, TimeSpan.FromMinutes(30));
+        _cache.Set(CacheKeys.Classes, response, TimeSpan.FromMinutes(30));
 
         return response;
     }

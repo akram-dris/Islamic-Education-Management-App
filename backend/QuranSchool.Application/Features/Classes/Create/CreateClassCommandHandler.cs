@@ -1,5 +1,6 @@
 using MediatR;
 using Microsoft.Extensions.Caching.Memory;
+using QuranSchool.Application.Abstractions.Caching;
 using QuranSchool.Application.Abstractions.Persistence;
 using QuranSchool.Domain.Abstractions;
 using QuranSchool.Domain.Entities;
@@ -33,7 +34,7 @@ public sealed class CreateClassCommandHandler : IRequestHandler<CreateClassComma
 
         await _classRepository.AddAsync(@class, cancellationToken);
 
-        _cache.Remove("classes");
+        _cache.Remove(CacheKeys.Classes);
 
         return @class.Id;
     }

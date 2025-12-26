@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using QuranSchool.Domain.Entities;
 
 namespace QuranSchool.Infrastructure.Persistence;
@@ -19,6 +20,11 @@ public class ApplicationDbContext : DbContext
     public DbSet<Submission> Submissions { get; set; }
     public DbSet<AttendanceSession> AttendanceSessions { get; set; }
     public DbSet<AttendanceRecord> AttendanceRecords { get; set; }
+
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    {
+        optionsBuilder.ConfigureWarnings(w => w.Ignore(RelationalEventId.PendingModelChangesWarning));
+    }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

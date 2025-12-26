@@ -1,9 +1,11 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using QuranSchool.Domain.Abstractions;
 
 namespace QuranSchool.API.Abstractions;
 
 [ApiController]
+[EnableRateLimiting("fixed")]
 public abstract class ApiController : ControllerBase
 {
     protected IActionResult HandleResult(Result result)

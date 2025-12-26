@@ -10,6 +10,7 @@ public class User
     public string FullName { get; set; } = string.Empty;
     public UserRole Role { get; set; }
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+    public bool IsDeleted { get; set; } = false;
 
     // Navigation properties can be added later if needed for inverse relationships
 }

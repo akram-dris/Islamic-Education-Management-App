@@ -1,6 +1,7 @@
 using System.Net.Http.Json;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using QuranSchool.Infrastructure.Persistence;
 using Testcontainers.PostgreSql;
@@ -22,15 +23,22 @@ public abstract class FunctionalTest : IAsyncLifetime
 
     public async Task InitializeAsync()
     {
-        Environment.SetEnvironmentVariable("JWT_SECRET_KEY", "super-secret-key-that-should-be-very-long-and-secure");
-        Environment.SetEnvironmentVariable("JWT_ISSUER", "QuranSchool");
-        Environment.SetEnvironmentVariable("JWT_AUDIENCE", "QuranSchool");
-
+        // Environment variables should be provided by the test runner or .env
         await _dbContainer.StartAsync();
 
         var factory = new WebApplicationFactory<Program>()
             .WithWebHostBuilder(builder =>
             {
+                builder.ConfigureAppConfiguration((context, config) =>
+                {
+                    config.AddInMemoryCollection(new Dictionary<string, string?>
+                    {
+                        ["JWT_SECRET_KEY"] = "super-secret-key-that-is-at-least-32-characters-long",
+                        ["JWT_ISSUER"] = "QuranSchool",
+                        ["JWT_AUDIENCE"] = "QuranSchool"
+                    });
+                });
+
                 builder.ConfigureServices(services =>
                 {
                     var descriptor = services.SingleOrDefault(

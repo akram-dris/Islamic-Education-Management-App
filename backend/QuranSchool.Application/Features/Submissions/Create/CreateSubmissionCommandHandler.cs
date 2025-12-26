@@ -25,6 +25,11 @@ public sealed class CreateSubmissionCommandHandler : IRequestHandler<CreateSubmi
             return Result<Guid>.Failure(DomainErrors.Assignment.NotFound);
         }
 
+        if (assignment.DueDate < DateOnly.FromDateTime(DateTime.UtcNow))
+        {
+            return Result<Guid>.Failure(DomainErrors.Assignment.PastDueDate);
+        }
+
         if (await _submissionRepository.ExistsAsync(request.StudentId, request.AssignmentId, cancellationToken))
         {
             return Result<Guid>.Failure(DomainErrors.Submission.AlreadySubmitted);

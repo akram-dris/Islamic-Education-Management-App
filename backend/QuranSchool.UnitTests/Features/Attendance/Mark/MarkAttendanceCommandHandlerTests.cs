@@ -1,6 +1,7 @@
 using FluentAssertions;
 using NSubstitute;
 using Xunit;
+using QuranSchool.Application.Abstractions.Authentication;
 using QuranSchool.Application.Abstractions.Persistence;
 using QuranSchool.Application.Features.Attendance.Mark;
 using QuranSchool.Domain.Entities;
@@ -13,13 +14,15 @@ public class MarkAttendanceCommandHandlerTests
 {
     private readonly IAttendanceRepository _attendanceRepositoryMock;
     private readonly IAllocationRepository _allocationRepositoryMock;
+    private readonly IUserContext _userContextMock;
     private readonly MarkAttendanceCommandHandler _handler;
 
     public MarkAttendanceCommandHandlerTests()
     {
         _attendanceRepositoryMock = Substitute.For<IAttendanceRepository>();
         _allocationRepositoryMock = Substitute.For<IAllocationRepository>();
-        _handler = new MarkAttendanceCommandHandler(_attendanceRepositoryMock, _allocationRepositoryMock);
+        _userContextMock = Substitute.For<IUserContext>();
+        _handler = new MarkAttendanceCommandHandler(_attendanceRepositoryMock, _allocationRepositoryMock, _userContextMock);
     }
 
     [Fact]
