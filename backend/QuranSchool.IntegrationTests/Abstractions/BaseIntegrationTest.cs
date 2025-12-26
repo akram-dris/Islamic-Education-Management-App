@@ -23,7 +23,7 @@ public abstract class BaseIntegrationTest : IAsyncLifetime
         var optionsBuilder = new DbContextOptionsBuilder<ApplicationDbContext>()
             .UseNpgsql(_dbContainer.GetConnectionString());
 
-        DbContext = new ApplicationDbContext(optionsBuilder.Options);
+        DbContext = new ApplicationDbContext(optionsBuilder.Options, null);
         await DbContext.Database.EnsureCreatedAsync();
     }
 

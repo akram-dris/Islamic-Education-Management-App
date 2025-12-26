@@ -5,17 +5,23 @@ using QuranSchool.Infrastructure.Persistence;
 using QuranSchool.Application.Abstractions.Authentication;
 
 using QuranSchool.API.Middleware;
-
 using Microsoft.AspNetCore.RateLimiting;
 using System.Threading.RateLimiting;
+using Serilog;
 
 DotNetEnv.Env.Load();
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Host.UseSerilog((context, loggerConfig) => 
+    loggerConfig.ReadFrom.Configuration(context.Configuration));
+
 // Add services to the container.
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddApplication();
+
+builder.Services.AddHealthChecks()
+    .AddNpgSql(builder.Configuration["DEFAULT_CONNECTION"]!);
 
 builder.Services.AddRateLimiter(options =>
 {
@@ -48,6 +54,8 @@ builder.Services.AddOpenApi(options =>
 
 var app = builder.Build();
 
+app.MapHealthChecks("/health");
+
 // Seed database
 using (var scope = app.Services.CreateScope())
 {
@@ -57,6 +65,7 @@ using (var scope = app.Services.CreateScope())
 }
 
 // Configure the HTTP request pipeline.
+app.UseSerilogRequestLogging();
 app.UseExceptionHandler();
 app.UseRateLimiter();
 app.MapOpenApi();

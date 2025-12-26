@@ -1,3 +1,4 @@
+using QuranSchool.Domain.Abstractions;
 using QuranSchool.Domain.Entities;
 using QuranSchool.Domain.Enums;
 
@@ -14,4 +15,10 @@ public interface IUserRepository
     Task<bool> IsParentLinkedAsync(Guid parentId, Guid studentId, CancellationToken cancellationToken = default);
     Task<List<User>> GetAllByRoleAsync(UserRole role, CancellationToken cancellationToken = default);
     Task<List<User>> GetByParentIdAsync(Guid parentId, CancellationToken cancellationToken = default);
+    Task<PagedList<User>> GetPagedAsync(
+        string? searchTerm, 
+        UserRole? role, 
+        int page, 
+        int pageSize, 
+        CancellationToken cancellationToken = default);
 }

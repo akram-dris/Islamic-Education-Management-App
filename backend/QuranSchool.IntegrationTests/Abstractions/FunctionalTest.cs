@@ -26,6 +26,8 @@ public abstract class FunctionalTest : IAsyncLifetime
         // Environment variables should be provided by the test runner or .env
         await _dbContainer.StartAsync();
 
+        Environment.SetEnvironmentVariable("DEFAULT_CONNECTION", _dbContainer.GetConnectionString());
+
         var factory = new WebApplicationFactory<Program>()
             .WithWebHostBuilder(builder =>
             {
@@ -33,6 +35,7 @@ public abstract class FunctionalTest : IAsyncLifetime
                 {
                     config.AddInMemoryCollection(new Dictionary<string, string?>
                     {
+                        ["DEFAULT_CONNECTION"] = _dbContainer.GetConnectionString(),
                         ["JWT_SECRET_KEY"] = "super-secret-key-that-is-at-least-32-characters-long",
                         ["JWT_ISSUER"] = "QuranSchool",
                         ["JWT_AUDIENCE"] = "QuranSchool"

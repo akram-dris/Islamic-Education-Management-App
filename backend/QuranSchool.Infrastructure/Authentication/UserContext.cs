@@ -13,7 +13,9 @@ public class UserContext : IUserContext
         _httpContextAccessor = httpContextAccessor;
     }
 
-    public Guid UserId => Guid.Parse(
-        _httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier) ?? 
-        throw new InvalidOperationException("User context is unavailable"));
+    public Guid UserId => 
+        _httpContextAccessor.HttpContext?.User is not null &&
+        Guid.TryParse(_httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier), out var userId) 
+            ? userId 
+            : Guid.Empty;
 }

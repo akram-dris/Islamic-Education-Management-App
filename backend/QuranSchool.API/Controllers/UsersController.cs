@@ -2,6 +2,7 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using QuranSchool.API.Abstractions;
+using QuranSchool.Domain.Abstractions;
 using QuranSchool.Application.Features.Users.LinkParent;
 using QuranSchool.Application.Features.Users.GetAll;
 using QuranSchool.Application.Features.Users.Register;
@@ -40,16 +41,24 @@ public class UsersController : ApiController
     }
 
     /// <summary>
-    /// Retrieves a list of users filtered by role.
+    /// Retrieves a list of users with pagination and filtering.
     /// </summary>
-    /// <param name="role">The role to filter by.</param>
+    /// <param name="role">The role to filter by (optional).</param>
+    /// <param name="searchTerm">The term to search for in name or username (optional).</param>
+    /// <param name="page">The page number (default 1).</param>
+    /// <param name="pageSize">The page size (default 10).</param>
     /// <param name="cancellationToken">Cancellation token.</param>
-    /// <returns>A list of users matching the role.</returns>
+    /// <returns>A paged list of users matching the criteria.</returns>
     [HttpGet]
-    [ProducesResponseType(typeof(List<UserResponse>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetAll([FromQuery] UserRole role, CancellationToken cancellationToken)
+    [ProducesResponseType(typeof(PagedList<UserResponse>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetAll(
+        [FromQuery] UserRole? role, 
+        [FromQuery] string? searchTerm, 
+        [FromQuery] int page = 1, 
+        [FromQuery] int pageSize = 10, 
+        CancellationToken cancellationToken = default)
     {
-        var query = new GetUsersQuery(role);
+        var query = new GetUsersQuery(role, searchTerm, page, pageSize);
         var result = await _sender.Send(query, cancellationToken);
         return HandleResult(result);
     }

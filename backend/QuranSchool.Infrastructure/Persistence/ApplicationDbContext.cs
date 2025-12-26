@@ -1,21 +1,28 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
+using QuranSchool.Application.Abstractions.Authentication;
+using QuranSchool.Domain.Abstractions;
 using QuranSchool.Domain.Entities;
 
 namespace QuranSchool.Infrastructure.Persistence;
 
 public class ApplicationDbContext : DbContext
 {
-    public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
+    private readonly IUserContext? _userContext;
+
+    public ApplicationDbContext(
+        DbContextOptions<ApplicationDbContext> options,
+        IUserContext? userContext = null) : base(options)
     {
+        _userContext = userContext;
     }
 
     public DbSet<User> Users { get; set; }
-    public DbSet<ParentStudent> ParentStudents { get; set; }
     public DbSet<Class> Classes { get; set; }
     public DbSet<Subject> Subjects { get; set; }
     public DbSet<Allocation> Allocations { get; set; }
     public DbSet<Enrollment> Enrollments { get; set; }
+    public DbSet<ParentStudent> ParentStudents { get; set; }
     public DbSet<Assignment> Assignments { get; set; }
     public DbSet<Submission> Submissions { get; set; }
     public DbSet<AttendanceSession> AttendanceSessions { get; set; }
@@ -24,6 +31,29 @@ public class ApplicationDbContext : DbContext
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         optionsBuilder.ConfigureWarnings(w => w.Ignore(RelationalEventId.PendingModelChangesWarning));
+    }
+
+    public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+    {
+        var entries = ChangeTracker
+            .Entries<Entity>()
+            .Where(e => e.State == EntityState.Added || e.State == EntityState.Modified);
+
+        foreach (var entityEntry in entries)
+        {
+            if (entityEntry.State == EntityState.Added)
+            {
+                entityEntry.Entity.CreatedAt = DateTime.UtcNow;
+                entityEntry.Entity.CreatedBy = _userContext?.UserId;
+            }
+            else
+            {
+                entityEntry.Entity.LastModifiedAt = DateTime.UtcNow;
+                entityEntry.Entity.LastModifiedBy = _userContext?.UserId;
+            }
+        }
+
+        return base.SaveChangesAsync(cancellationToken);
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)

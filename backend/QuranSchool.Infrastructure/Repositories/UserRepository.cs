@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using QuranSchool.Application.Abstractions.Persistence;
+using QuranSchool.Domain.Abstractions;
 using QuranSchool.Domain.Entities;
 using QuranSchool.Domain.Enums;
 using QuranSchool.Infrastructure.Persistence;
@@ -25,6 +26,36 @@ public class UserRepository : IUserRepository
     {
         return await _dbContext.Users
             .FirstOrDefaultAsync(u => u.Username == username, cancellationToken);
+    }
+
+    public async Task<PagedList<User>> GetPagedAsync(
+        string? searchTerm, 
+        UserRole? role, 
+        int page, 
+        int pageSize, 
+        CancellationToken cancellationToken = default)
+    {
+        IQueryable<User> query = _dbContext.Users;
+
+        if (!string.IsNullOrWhiteSpace(searchTerm))
+        {
+            query = query.Where(u => u.FullName.Contains(searchTerm) || u.Username.Contains(searchTerm));
+        }
+
+        if (role.HasValue)
+        {
+            query = query.Where(u => u.Role == role.Value);
+        }
+
+        var totalCount = await query.CountAsync(cancellationToken);
+        
+        var items = await query
+            .OrderBy(u => u.FullName)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync(cancellationToken);
+
+        return new PagedList<User>(items, page, pageSize, totalCount);
     }
 
     public async Task AddAsync(User user, CancellationToken cancellationToken = default)
