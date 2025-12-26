@@ -30,6 +30,11 @@ public class SubjectRepository : ISubjectRepository
         await _dbContext.SaveChangesAsync(cancellationToken);
     }
 
+    public async Task<bool> ExistsAsync(string name, CancellationToken cancellationToken = default)
+    {
+        return await _dbContext.Subjects.AnyAsync(s => s.Name == name, cancellationToken);
+    }
+
     public async Task UpdateAsync(Subject subject, CancellationToken cancellationToken = default)
     {
         _dbContext.Subjects.Update(subject);

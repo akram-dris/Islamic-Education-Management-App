@@ -4,7 +4,7 @@ using QuranSchool.Domain.Abstractions;
 
 namespace QuranSchool.Application.Features.Users.GetAll;
 
-internal sealed class GetUsersQueryHandler : IRequestHandler<GetUsersQuery, Result<List<UserResponse>>>
+public sealed class GetUsersQueryHandler : IRequestHandler<GetUsersQuery, Result<List<UserResponse>>>
 {
     private readonly IUserRepository _userRepository;
 

@@ -6,7 +6,7 @@ using QuranSchool.Domain.Enums;
 
 namespace QuranSchool.Application.Features.Users.LinkParent;
 
-internal sealed class LinkParentCommandHandler : IRequestHandler<LinkParentCommand, Result>
+public sealed class LinkParentCommandHandler : IRequestHandler<LinkParentCommand, Result>
 {
     private readonly IUserRepository _userRepository;
 

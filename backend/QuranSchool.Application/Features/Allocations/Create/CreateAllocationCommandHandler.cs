@@ -6,7 +6,7 @@ using QuranSchool.Domain.Enums;
 
 namespace QuranSchool.Application.Features.Allocations.Create;
 
-internal sealed class CreateAllocationCommandHandler : IRequestHandler<CreateAllocationCommand, Result<Guid>>
+public sealed class CreateAllocationCommandHandler : IRequestHandler<CreateAllocationCommand, Result<Guid>>
 {
     private readonly IAllocationRepository _allocationRepository;
     private readonly IUserRepository _userRepository;
@@ -43,6 +43,11 @@ internal sealed class CreateAllocationCommandHandler : IRequestHandler<CreateAll
         if (subject is null)
         {
             return Result<Guid>.Failure(Error.NotFound("Subject.NotFound", "Subject not found."));
+        }
+
+        if (await _allocationRepository.ExistsAsync(request.TeacherId, request.ClassId, request.SubjectId, cancellationToken))
+        {
+            return Result<Guid>.Failure(Error.Conflict("Allocation.Duplicate", "This teacher is already allocated to this class and subject."));
         }
 
         var allocation = new Allocation

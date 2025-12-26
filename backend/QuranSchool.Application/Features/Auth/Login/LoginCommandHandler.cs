@@ -5,7 +5,7 @@ using QuranSchool.Domain.Abstractions;
 
 namespace QuranSchool.Application.Features.Auth.Login;
 
-internal sealed class LoginCommandHandler : IRequestHandler<LoginCommand, Result<LoginResponse>>
+public sealed class LoginCommandHandler : IRequestHandler<LoginCommand, Result<LoginResponse>>
 {
     private readonly IUserRepository _userRepository;
     private readonly IPasswordHasher _passwordHasher;

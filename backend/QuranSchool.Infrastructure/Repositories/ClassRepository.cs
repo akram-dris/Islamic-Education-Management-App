@@ -30,6 +30,11 @@ public class ClassRepository : IClassRepository
         await _dbContext.SaveChangesAsync(cancellationToken);
     }
 
+    public async Task<bool> ExistsAsync(string name, CancellationToken cancellationToken = default)
+    {
+        return await _dbContext.Classes.AnyAsync(c => c.Name == name, cancellationToken);
+    }
+
     public async Task UpdateAsync(Class @class, CancellationToken cancellationToken = default)
     {
         _dbContext.Classes.Update(@class);

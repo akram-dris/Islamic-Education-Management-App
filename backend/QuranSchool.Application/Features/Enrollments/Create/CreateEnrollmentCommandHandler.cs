@@ -5,7 +5,7 @@ using QuranSchool.Domain.Entities;
 
 namespace QuranSchool.Application.Features.Enrollments.Create;
 
-internal sealed class CreateEnrollmentCommandHandler : IRequestHandler<CreateEnrollmentCommand, Result<Guid>>
+public sealed class CreateEnrollmentCommandHandler : IRequestHandler<CreateEnrollmentCommand, Result<Guid>>
 {
     private readonly IEnrollmentRepository _enrollmentRepository;
 

@@ -5,7 +5,7 @@ using QuranSchool.Domain.Entities;
 
 namespace QuranSchool.Application.Features.Classes.Create;
 
-internal sealed class CreateClassCommandHandler : IRequestHandler<CreateClassCommand, Result<Guid>>
+public sealed class CreateClassCommandHandler : IRequestHandler<CreateClassCommand, Result<Guid>>
 {
     private readonly IClassRepository _classRepository;
 
@@ -16,6 +16,11 @@ internal sealed class CreateClassCommandHandler : IRequestHandler<CreateClassCom
 
     public async Task<Result<Guid>> Handle(CreateClassCommand request, CancellationToken cancellationToken)
     {
+        if (await _classRepository.ExistsAsync(request.Name, cancellationToken))
+        {
+            return Result<Guid>.Failure(Error.Conflict("Class.DuplicateName", "A class with this name already exists."));
+        }
+
         var @class = new Class
         {
             Id = Guid.NewGuid(),

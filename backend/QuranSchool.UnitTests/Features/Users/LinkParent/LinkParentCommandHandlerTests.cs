@@ -1,0 +1,54 @@
+using FluentAssertions;
+using NSubstitute;
+using Xunit;
+using QuranSchool.Application.Abstractions.Persistence;
+using QuranSchool.Application.Features.Users.LinkParent;
+using QuranSchool.Domain.Entities;
+using QuranSchool.Domain.Enums;
+
+namespace QuranSchool.UnitTests.Features.Users.LinkParent;
+
+public class LinkParentCommandHandlerTests
+{
+    private readonly IUserRepository _userRepositoryMock;
+    private readonly LinkParentCommandHandler _handler;
+
+    public LinkParentCommandHandlerTests()
+    {
+        _userRepositoryMock = Substitute.For<IUserRepository>();
+        _handler = new LinkParentCommandHandler(_userRepositoryMock);
+    }
+
+    [Fact]
+    public async Task Handle_ShouldReturnFailure_WhenStudentNotFound()
+    {
+        // Arrange
+        var command = new LinkParentCommand(Guid.NewGuid(), Guid.NewGuid());
+        _userRepositoryMock.GetByIdAsync(command.ParentId).Returns(new User { Role = UserRole.Parent });
+        _userRepositoryMock.GetByIdAsync(command.StudentId).Returns((User?)null);
+
+        // Act
+        var result = await _handler.Handle(command, default);
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Error.Code.Should().Be("User.StudentNotFound");
+    }
+
+    [Fact]
+    public async Task Handle_ShouldReturnFailure_WhenAlreadyLinked()
+    {
+        // Arrange
+        var command = new LinkParentCommand(Guid.NewGuid(), Guid.NewGuid());
+        _userRepositoryMock.GetByIdAsync(command.ParentId).Returns(new User { Role = UserRole.Parent });
+        _userRepositoryMock.GetByIdAsync(command.StudentId).Returns(new User { Role = UserRole.Student });
+        _userRepositoryMock.IsParentLinkedAsync(command.ParentId, command.StudentId).Returns(true);
+
+        // Act
+        var result = await _handler.Handle(command, default);
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Error.Code.Should().Be("User.AlreadyLinked");
+    }
+}

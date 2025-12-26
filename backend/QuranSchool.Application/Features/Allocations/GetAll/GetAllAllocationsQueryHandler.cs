@@ -4,7 +4,7 @@ using QuranSchool.Domain.Abstractions;
 
 namespace QuranSchool.Application.Features.Allocations.GetAll;
 
-internal sealed class GetAllAllocationsQueryHandler : IRequestHandler<GetAllAllocationsQuery, Result<List<AllocationResponse>>>
+public sealed class GetAllAllocationsQueryHandler : IRequestHandler<GetAllAllocationsQuery, Result<List<AllocationResponse>>>
 {
     private readonly IAllocationRepository _allocationRepository;
 

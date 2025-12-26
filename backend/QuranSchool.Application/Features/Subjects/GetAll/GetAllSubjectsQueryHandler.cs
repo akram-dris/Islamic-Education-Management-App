@@ -4,7 +4,7 @@ using QuranSchool.Domain.Abstractions;
 
 namespace QuranSchool.Application.Features.Subjects.GetAll;
 
-internal sealed class GetAllSubjectsQueryHandler : IRequestHandler<GetAllSubjectsQuery, Result<List<SubjectResponse>>>
+public sealed class GetAllSubjectsQueryHandler : IRequestHandler<GetAllSubjectsQuery, Result<List<SubjectResponse>>>
 {
     private readonly ISubjectRepository _subjectRepository;
 

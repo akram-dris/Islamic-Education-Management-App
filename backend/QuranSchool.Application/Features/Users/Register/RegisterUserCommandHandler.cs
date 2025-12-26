@@ -6,7 +6,7 @@ using QuranSchool.Domain.Entities;
 
 namespace QuranSchool.Application.Features.Users.Register;
 
-internal sealed class RegisterUserCommandHandler : IRequestHandler<RegisterUserCommand, Result<Guid>>
+public sealed class RegisterUserCommandHandler : IRequestHandler<RegisterUserCommand, Result<Guid>>
 {
     private readonly IUserRepository _userRepository;
     private readonly IPasswordHasher _passwordHasher;

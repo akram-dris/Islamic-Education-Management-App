@@ -5,7 +5,7 @@ using QuranSchool.Domain.Entities;
 
 namespace QuranSchool.Application.Features.Subjects.Create;
 
-internal sealed class CreateSubjectCommandHandler : IRequestHandler<CreateSubjectCommand, Result<Guid>>
+public sealed class CreateSubjectCommandHandler : IRequestHandler<CreateSubjectCommand, Result<Guid>>
 {
     private readonly ISubjectRepository _subjectRepository;
 
@@ -16,6 +16,11 @@ internal sealed class CreateSubjectCommandHandler : IRequestHandler<CreateSubjec
 
     public async Task<Result<Guid>> Handle(CreateSubjectCommand request, CancellationToken cancellationToken)
     {
+        if (await _subjectRepository.ExistsAsync(request.Name, cancellationToken))
+        {
+            return Result<Guid>.Failure(Error.Conflict("Subject.DuplicateName", "A subject with this name already exists."));
+        }
+
         var subject = new Subject
         {
             Id = Guid.NewGuid(),
