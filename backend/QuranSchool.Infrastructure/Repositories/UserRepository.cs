@@ -32,6 +32,18 @@ public class UserRepository : IUserRepository
         await _dbContext.SaveChangesAsync(cancellationToken);
     }
 
+    public async Task UpdateAsync(User user, CancellationToken cancellationToken = default)
+    {
+        _dbContext.Users.Update(user);
+        await _dbContext.SaveChangesAsync(cancellationToken);
+    }
+
+    public async Task DeleteAsync(User user, CancellationToken cancellationToken = default)
+    {
+        _dbContext.Users.Remove(user);
+        await _dbContext.SaveChangesAsync(cancellationToken);
+    }
+
     public async Task AddParentStudentLinkAsync(ParentStudent parentStudent, CancellationToken cancellationToken = default)
     {
         await _dbContext.ParentStudents.AddAsync(parentStudent, cancellationToken);
@@ -47,6 +59,14 @@ public class UserRepository : IUserRepository
     {
         return await _dbContext.Users
             .Where(u => u.Role == role)
+            .ToListAsync(cancellationToken);
+    }
+
+    public async Task<List<User>> GetByParentIdAsync(Guid parentId, CancellationToken cancellationToken = default)
+    {
+        return await _dbContext.ParentStudents
+            .Where(ps => ps.ParentId == parentId)
+            .Select(ps => ps.Student!)
             .ToListAsync(cancellationToken);
     }
 }
