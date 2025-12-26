@@ -3,6 +3,7 @@ using QuranSchool.Application.Abstractions.Authentication;
 using QuranSchool.Application.Abstractions.Persistence;
 using QuranSchool.Domain.Abstractions;
 using QuranSchool.Domain.Entities;
+using QuranSchool.Domain.Errors;
 
 namespace QuranSchool.Application.Features.Users.Register;
 
@@ -22,7 +23,7 @@ public sealed class RegisterUserCommandHandler : IRequestHandler<RegisterUserCom
         var existingUser = await _userRepository.GetByUsernameAsync(request.Username, cancellationToken);
         if (existingUser is not null)
         {
-            return Result<Guid>.Failure(Error.Conflict("User.DuplicateUsername", "Username is already taken."));
+            return Result<Guid>.Failure(DomainErrors.User.DuplicateUsername);
         }
 
         var user = new User

@@ -1,6 +1,7 @@
 using MediatR;
 using QuranSchool.Application.Abstractions.Persistence;
 using QuranSchool.Domain.Abstractions;
+using QuranSchool.Domain.Errors;
 
 namespace QuranSchool.Application.Features.Submissions.Grade;
 
@@ -18,7 +19,7 @@ public sealed class GradeSubmissionCommandHandler : IRequestHandler<GradeSubmiss
         var submission = await _submissionRepository.GetByIdAsync(request.SubmissionId, cancellationToken);
         if (submission is null)
         {
-            return Result.Failure(Error.NotFound("Submission.NotFound", "Submission not found."));
+            return Result.Failure(DomainErrors.Submission.NotFound);
         }
 
         submission.Grade = request.Grade;

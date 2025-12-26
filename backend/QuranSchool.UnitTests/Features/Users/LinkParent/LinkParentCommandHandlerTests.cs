@@ -5,6 +5,7 @@ using QuranSchool.Application.Abstractions.Persistence;
 using QuranSchool.Application.Features.Users.LinkParent;
 using QuranSchool.Domain.Entities;
 using QuranSchool.Domain.Enums;
+using QuranSchool.Domain.Errors;
 
 namespace QuranSchool.UnitTests.Features.Users.LinkParent;
 
@@ -32,7 +33,7 @@ public class LinkParentCommandHandlerTests
 
         // Assert
         result.IsFailure.Should().BeTrue();
-        result.Error.Code.Should().Be("User.StudentNotFound");
+        result.Error.Should().Be(DomainErrors.User.StudentNotFound);
     }
 
     [Fact]
@@ -49,6 +50,6 @@ public class LinkParentCommandHandlerTests
 
         // Assert
         result.IsFailure.Should().BeTrue();
-        result.Error.Code.Should().Be("User.AlreadyLinked");
+        result.Error.Should().Be(DomainErrors.User.AlreadyLinked);
     }
 }

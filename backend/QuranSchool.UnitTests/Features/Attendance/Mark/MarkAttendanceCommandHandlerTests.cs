@@ -5,6 +5,7 @@ using QuranSchool.Application.Abstractions.Persistence;
 using QuranSchool.Application.Features.Attendance.Mark;
 using QuranSchool.Domain.Entities;
 using QuranSchool.Domain.Enums;
+using QuranSchool.Domain.Errors;
 
 namespace QuranSchool.UnitTests.Features.Attendance.Mark;
 
@@ -33,6 +34,6 @@ public class MarkAttendanceCommandHandlerTests
 
         // Assert
         result.IsFailure.Should().BeTrue();
-        result.Error.Code.Should().Be("Allocation.NotFound");
+        result.Error.Should().Be(DomainErrors.Allocation.NotFound);
     }
 }

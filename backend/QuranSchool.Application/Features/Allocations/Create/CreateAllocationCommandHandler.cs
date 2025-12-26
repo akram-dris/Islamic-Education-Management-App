@@ -3,6 +3,7 @@ using QuranSchool.Application.Abstractions.Persistence;
 using QuranSchool.Domain.Abstractions;
 using QuranSchool.Domain.Entities;
 using QuranSchool.Domain.Enums;
+using QuranSchool.Domain.Errors;
 
 namespace QuranSchool.Application.Features.Allocations.Create;
 
@@ -30,24 +31,24 @@ public sealed class CreateAllocationCommandHandler : IRequestHandler<CreateAlloc
         var teacher = await _userRepository.GetByIdAsync(request.TeacherId, cancellationToken);
         if (teacher is null || teacher.Role != UserRole.Teacher)
         {
-            return Result<Guid>.Failure(Error.NotFound("User.TeacherNotFound", "Teacher not found."));
+            return Result<Guid>.Failure(DomainErrors.User.TeacherNotFound);
         }
 
         var @class = await _classRepository.GetByIdAsync(request.ClassId, cancellationToken);
         if (@class is null)
         {
-            return Result<Guid>.Failure(Error.NotFound("Class.NotFound", "Class not found."));
+            return Result<Guid>.Failure(DomainErrors.Class.NotFound);
         }
 
         var subject = await _subjectRepository.GetByIdAsync(request.SubjectId, cancellationToken);
         if (subject is null)
         {
-            return Result<Guid>.Failure(Error.NotFound("Subject.NotFound", "Subject not found."));
+            return Result<Guid>.Failure(DomainErrors.Subject.NotFound);
         }
 
         if (await _allocationRepository.ExistsAsync(request.TeacherId, request.ClassId, request.SubjectId, cancellationToken))
         {
-            return Result<Guid>.Failure(Error.Conflict("Allocation.Duplicate", "This teacher is already allocated to this class and subject."));
+            return Result<Guid>.Failure(DomainErrors.Allocation.Duplicate);
         }
 
         var allocation = new Allocation

@@ -2,6 +2,7 @@ using MediatR;
 using QuranSchool.Application.Abstractions.Persistence;
 using QuranSchool.Domain.Abstractions;
 using QuranSchool.Domain.Entities;
+using QuranSchool.Domain.Errors;
 
 namespace QuranSchool.Application.Features.Submissions.Create;
 
@@ -21,12 +22,12 @@ public sealed class CreateSubmissionCommandHandler : IRequestHandler<CreateSubmi
         var assignment = await _assignmentRepository.GetByIdAsync(request.AssignmentId, cancellationToken);
         if (assignment is null)
         {
-            return Result<Guid>.Failure(Error.NotFound("Assignment.NotFound", "Assignment not found."));
+            return Result<Guid>.Failure(DomainErrors.Assignment.NotFound);
         }
 
         if (await _submissionRepository.ExistsAsync(request.StudentId, request.AssignmentId, cancellationToken))
         {
-            return Result<Guid>.Failure(Error.Conflict("Submission.AlreadySubmitted", "You have already submitted this assignment."));
+            return Result<Guid>.Failure(DomainErrors.Submission.AlreadySubmitted);
         }
 
         var submission = new Submission

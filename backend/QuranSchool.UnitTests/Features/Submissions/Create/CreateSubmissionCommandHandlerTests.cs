@@ -4,6 +4,7 @@ using Xunit;
 using QuranSchool.Application.Abstractions.Persistence;
 using QuranSchool.Application.Features.Submissions.Create;
 using QuranSchool.Domain.Entities;
+using QuranSchool.Domain.Errors;
 
 namespace QuranSchool.UnitTests.Features.Submissions.Create;
 
@@ -33,6 +34,6 @@ public class CreateSubmissionCommandHandlerTests
 
         // Assert
         result.IsFailure.Should().BeTrue();
-        result.Error.Code.Should().Be("Submission.AlreadySubmitted");
+        result.Error.Should().Be(DomainErrors.Submission.AlreadySubmitted);
     }
 }

@@ -1,6 +1,7 @@
 using MediatR;
 using QuranSchool.Application.Abstractions.Persistence;
 using QuranSchool.Domain.Abstractions;
+using QuranSchool.Domain.Errors;
 
 namespace QuranSchool.Application.Features.Users.Delete;
 
@@ -18,7 +19,7 @@ public sealed class DeleteUserCommandHandler : IRequestHandler<DeleteUserCommand
         var user = await _userRepository.GetByIdAsync(request.UserId, cancellationToken);
         if (user is null)
         {
-            return Result.Failure(Error.NotFound("User.NotFound", "User not found."));
+            return Result.Failure(DomainErrors.User.NotFound);
         }
 
         await _userRepository.DeleteAsync(user, cancellationToken);

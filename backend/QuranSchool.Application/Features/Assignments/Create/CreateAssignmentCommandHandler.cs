@@ -2,6 +2,7 @@ using MediatR;
 using QuranSchool.Application.Abstractions.Persistence;
 using QuranSchool.Domain.Abstractions;
 using QuranSchool.Domain.Entities;
+using QuranSchool.Domain.Errors;
 
 namespace QuranSchool.Application.Features.Assignments.Create;
 
@@ -21,7 +22,7 @@ public sealed class CreateAssignmentCommandHandler : IRequestHandler<CreateAssig
         var allocation = await _allocationRepository.GetByIdAsync(request.AllocationId, cancellationToken);
         if (allocation is null)
         {
-            return Result<Guid>.Failure(Error.NotFound("Allocation.NotFound", "Allocation not found."));
+            return Result<Guid>.Failure(DomainErrors.Allocation.NotFound);
         }
 
         var assignment = new Assignment

@@ -5,6 +5,7 @@ using Xunit;
 using QuranSchool.Application.Abstractions.Persistence;
 using QuranSchool.Application.Features.Classes.Create;
 using QuranSchool.Domain.Entities;
+using QuranSchool.Domain.Errors;
 
 namespace QuranSchool.UnitTests.Features.Classes.Create;
 
@@ -33,6 +34,6 @@ public class CreateClassCommandHandlerTests
 
         // Assert
         result.IsFailure.Should().BeTrue();
-        result.Error.Code.Should().Be("Class.DuplicateName");
+        result.Error.Should().Be(DomainErrors.Class.DuplicateName);
     }
 }

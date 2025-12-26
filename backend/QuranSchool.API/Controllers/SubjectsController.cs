@@ -8,7 +8,7 @@ using QuranSchool.Application.Features.Subjects.GetAll;
 namespace QuranSchool.API.Controllers;
 
 [Authorize]
-[Route("api/subjects")]
+[Route(ApiRoutes.Subjects.BaseRoute)]
 public class SubjectsController : ApiController
 {
     private readonly ISender _sender;
@@ -24,7 +24,7 @@ public class SubjectsController : ApiController
     /// <param name="command">The subject details.</param>
     /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>The created subject ID.</returns>
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = RoleNames.Admin)]
     [HttpPost]
     [ProducesResponseType(typeof(Guid), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status409Conflict)]

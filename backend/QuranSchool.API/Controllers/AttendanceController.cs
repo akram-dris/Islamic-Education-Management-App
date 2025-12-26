@@ -9,7 +9,7 @@ using QuranSchool.Application.Features.Attendance.GetMy;
 namespace QuranSchool.API.Controllers;
 
 [Authorize]
-[Route("api/attendance")]
+[Route(ApiRoutes.Attendance.BaseRoute)]
 public class AttendanceController : ApiController
 {
     private readonly ISender _sender;
@@ -25,8 +25,8 @@ public class AttendanceController : ApiController
     /// <param name="command">The attendance records.</param>
     /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>No content if successful.</returns>
-    [Authorize(Roles = "Teacher,Admin")]
-    [HttpPost("mark")]
+    [Authorize(Roles = RoleNames.TeacherOrAdmin)]
+    [HttpPost(ApiRoutes.Attendance.Mark)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Mark([FromBody] MarkAttendanceCommand command, CancellationToken cancellationToken)
@@ -40,7 +40,7 @@ public class AttendanceController : ApiController
     /// </summary>
     /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>A list of attendance records.</returns>
-    [HttpGet("my")]
+    [HttpGet(ApiRoutes.Attendance.My)]
     [ProducesResponseType(typeof(List<AttendanceResponse>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetMyAttendance(CancellationToken cancellationToken)
     {

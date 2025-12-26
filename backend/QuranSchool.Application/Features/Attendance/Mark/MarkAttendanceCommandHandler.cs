@@ -2,6 +2,7 @@ using MediatR;
 using QuranSchool.Application.Abstractions.Persistence;
 using QuranSchool.Domain.Abstractions;
 using QuranSchool.Domain.Entities;
+using QuranSchool.Domain.Errors;
 
 namespace QuranSchool.Application.Features.Attendance.Mark;
 
@@ -23,7 +24,7 @@ public sealed class MarkAttendanceCommandHandler : IRequestHandler<MarkAttendanc
         var allocation = await _allocationRepository.GetByIdAsync(request.AllocationId, cancellationToken);
         if (allocation is null)
         {
-            return Result.Failure(Error.NotFound("Allocation.NotFound", "Allocation not found."));
+            return Result.Failure(DomainErrors.Allocation.NotFound);
         }
 
         var session = await _attendanceRepository.GetSessionByAllocationAndDateAsync(request.AllocationId, request.Date, cancellationToken);

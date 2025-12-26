@@ -6,6 +6,7 @@ using QuranSchool.Application.Abstractions.Persistence;
 using QuranSchool.Application.Features.Auth.Login;
 using QuranSchool.Domain.Entities;
 using QuranSchool.Domain.Enums;
+using QuranSchool.Domain.Errors;
 
 namespace QuranSchool.UnitTests.Features.Auth.Login;
 
@@ -36,7 +37,7 @@ public class LoginCommandHandlerTests
 
         // Assert
         result.IsFailure.Should().BeTrue();
-        result.Error.Code.Should().Be("Auth.InvalidCredentials");
+        result.Error.Should().Be(DomainErrors.Auth.InvalidCredentials);
     }
 
     [Fact]

@@ -3,6 +3,7 @@ using Microsoft.Extensions.Caching.Memory;
 using QuranSchool.Application.Abstractions.Persistence;
 using QuranSchool.Domain.Abstractions;
 using QuranSchool.Domain.Entities;
+using QuranSchool.Domain.Errors;
 
 namespace QuranSchool.Application.Features.Subjects.Create;
 
@@ -21,7 +22,7 @@ public sealed class CreateSubjectCommandHandler : IRequestHandler<CreateSubjectC
     {
         if (await _subjectRepository.ExistsAsync(request.Name, cancellationToken))
         {
-            return Result<Guid>.Failure(Error.Conflict("Subject.DuplicateName", "A subject with this name already exists."));
+            return Result<Guid>.Failure(DomainErrors.Subject.DuplicateName);
         }
 
         var subject = new Subject

@@ -5,6 +5,7 @@ using QuranSchool.Application.Abstractions.Persistence;
 using QuranSchool.Application.Features.Allocations.Create;
 using QuranSchool.Domain.Entities;
 using QuranSchool.Domain.Enums;
+using QuranSchool.Domain.Errors;
 
 namespace QuranSchool.UnitTests.Features.Allocations.Create;
 
@@ -47,6 +48,6 @@ public class CreateAllocationCommandHandlerTests
 
         // Assert
         result.IsFailure.Should().BeTrue();
-        result.Error.Code.Should().Be("Allocation.Duplicate");
+        result.Error.Should().Be(DomainErrors.Allocation.Duplicate);
     }
 }

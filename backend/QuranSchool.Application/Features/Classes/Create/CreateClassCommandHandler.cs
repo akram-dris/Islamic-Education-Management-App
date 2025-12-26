@@ -3,6 +3,7 @@ using Microsoft.Extensions.Caching.Memory;
 using QuranSchool.Application.Abstractions.Persistence;
 using QuranSchool.Domain.Abstractions;
 using QuranSchool.Domain.Entities;
+using QuranSchool.Domain.Errors;
 
 namespace QuranSchool.Application.Features.Classes.Create;
 
@@ -21,7 +22,7 @@ public sealed class CreateClassCommandHandler : IRequestHandler<CreateClassComma
     {
         if (await _classRepository.ExistsAsync(request.Name, cancellationToken))
         {
-            return Result<Guid>.Failure(Error.Conflict("Class.DuplicateName", "A class with this name already exists."));
+            return Result<Guid>.Failure(DomainErrors.Class.DuplicateName);
         }
 
         var @class = new Class

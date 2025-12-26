@@ -9,7 +9,7 @@ using QuranSchool.Application.Features.Submissions.Grade;
 namespace QuranSchool.API.Controllers;
 
 [Authorize]
-[Route("api/submissions")]
+[Route(ApiRoutes.Submissions.BaseRoute)]
 public class SubmissionsController : ApiController
 {
     private readonly ISender _sender;
@@ -25,7 +25,7 @@ public class SubmissionsController : ApiController
     /// <param name="request">The submission details.</param>
     /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>The created submission ID.</returns>
-    [Authorize(Roles = "Student")]
+    [Authorize(Roles = RoleNames.Student)]
     [HttpPost]
     [ProducesResponseType(typeof(Guid), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status409Conflict)]
@@ -53,8 +53,8 @@ public class SubmissionsController : ApiController
     /// <param name="request">The grading details.</param>
     /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>No content if successful.</returns>
-    [Authorize(Roles = "Teacher,Admin")]
-    [HttpPost("{id}/grade")]
+    [Authorize(Roles = RoleNames.TeacherOrAdmin)]
+    [HttpPost(ApiRoutes.Submissions.Grade)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Grade(Guid id, [FromBody] GradeSubmissionRequest request, CancellationToken cancellationToken)

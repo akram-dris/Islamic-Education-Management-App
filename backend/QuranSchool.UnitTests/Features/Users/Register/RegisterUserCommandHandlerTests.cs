@@ -7,6 +7,7 @@ using QuranSchool.Application.Features.Users.Register;
 using QuranSchool.Domain.Abstractions;
 using QuranSchool.Domain.Entities;
 using QuranSchool.Domain.Enums;
+using QuranSchool.Domain.Errors;
 
 namespace QuranSchool.UnitTests.Features.Users.Register;
 
@@ -37,7 +38,7 @@ public class RegisterUserCommandHandlerTests
 
         // Assert
         result.IsFailure.Should().BeTrue();
-        result.Error.Code.Should().Be("User.DuplicateUsername");
+        result.Error.Should().Be(DomainErrors.User.DuplicateUsername);
     }
 
     [Fact]

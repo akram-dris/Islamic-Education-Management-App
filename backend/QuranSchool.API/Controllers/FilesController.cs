@@ -1,11 +1,12 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using QuranSchool.API.Abstractions;
 using QuranSchool.Application.Abstractions.Storage;
 
 namespace QuranSchool.API.Controllers;
 
 [Authorize]
-[Route("api/files")]
+[Route(ApiRoutes.Files.BaseRoute)]
 public class FilesController : ControllerBase
 {
     private readonly IFileStorage _fileStorage;
@@ -15,7 +16,7 @@ public class FilesController : ControllerBase
         _fileStorage = fileStorage;
     }
 
-    [HttpPost("upload")]
+    [HttpPost(ApiRoutes.Files.Upload)]
     public async Task<IActionResult> Upload(IFormFile file, CancellationToken cancellationToken)
     {
         if (file == null || file.Length == 0)

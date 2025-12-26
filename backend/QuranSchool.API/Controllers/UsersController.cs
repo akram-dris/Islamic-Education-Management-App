@@ -11,8 +11,8 @@ using QuranSchool.Domain.Enums;
 
 namespace QuranSchool.API.Controllers;
 
-[Authorize(Roles = "Admin")]
-[Route("api/users")]
+[Authorize(Roles = RoleNames.Admin)]
+[Route(ApiRoutes.Users.BaseRoute)]
 public class UsersController : ApiController
 {
     private readonly ISender _sender;
@@ -30,7 +30,7 @@ public class UsersController : ApiController
     /// <returns>The ID of the newly created user.</returns>
     /// <response code="200">Returns the unique identifier of the user.</response>
     /// <response code="400">If validation fails or username is taken.</response>
-    [HttpPost("register")]
+    [HttpPost(ApiRoutes.Users.Register)]
     [ProducesResponseType(typeof(Guid), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Register([FromBody] RegisterUserCommand command, CancellationToken cancellationToken)
@@ -94,7 +94,7 @@ public class UsersController : ApiController
     /// <param name="studentId">The ID of the student.</param>
     /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>No content if successful.</returns>
-    [HttpPost("{parentId}/students")]
+    [HttpPost(ApiRoutes.Users.LinkStudent)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> LinkStudent(Guid parentId, [FromBody] Guid studentId, CancellationToken cancellationToken)

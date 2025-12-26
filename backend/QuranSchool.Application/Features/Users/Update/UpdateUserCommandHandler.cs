@@ -2,6 +2,7 @@ using MediatR;
 using QuranSchool.Application.Abstractions.Authentication;
 using QuranSchool.Application.Abstractions.Persistence;
 using QuranSchool.Domain.Abstractions;
+using QuranSchool.Domain.Errors;
 
 namespace QuranSchool.Application.Features.Users.Update;
 
@@ -21,7 +22,7 @@ public sealed class UpdateUserCommandHandler : IRequestHandler<UpdateUserCommand
         var user = await _userRepository.GetByIdAsync(request.UserId, cancellationToken);
         if (user is null)
         {
-            return Result.Failure(Error.NotFound("User.NotFound", "User not found."));
+            return Result.Failure(DomainErrors.User.NotFound);
         }
 
         user.FullName = request.FullName;

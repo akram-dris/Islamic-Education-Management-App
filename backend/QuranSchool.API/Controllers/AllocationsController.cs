@@ -8,7 +8,7 @@ using QuranSchool.Application.Features.Allocations.GetAll;
 namespace QuranSchool.API.Controllers;
 
 [Authorize]
-[Route("api/allocations")]
+[Route(ApiRoutes.Allocations.BaseRoute)]
 public class AllocationsController : ApiController
 {
     private readonly ISender _sender;
@@ -24,7 +24,7 @@ public class AllocationsController : ApiController
     /// <param name="command">The allocation details.</param>
     /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>The created allocation ID.</returns>
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = RoleNames.Admin)]
     [HttpPost]
     [ProducesResponseType(typeof(Guid), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status409Conflict)]

@@ -10,8 +10,8 @@ using QuranSchool.Application.Features.Users.GetAll;
 
 namespace QuranSchool.API.Controllers;
 
-[Authorize(Roles = "Parent")]
-[Route("api/parents")]
+[Authorize(Roles = RoleNames.Parent)]
+[Route(ApiRoutes.Parents.BaseRoute)]
 public class ParentsController : ApiController
 {
     private readonly ISender _sender;
@@ -24,8 +24,9 @@ public class ParentsController : ApiController
     /// <summary>
     /// Retrieves all children linked to the authenticated parent.
     /// </summary>
+    /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>A list of students.</returns>
-    [HttpGet("children")]
+    [HttpGet(ApiRoutes.Parents.Children)]
     [ProducesResponseType(typeof(List<UserResponse>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetMyChildren(CancellationToken cancellationToken)
     {
@@ -43,7 +44,7 @@ public class ParentsController : ApiController
     /// <param name="studentId">The ID of the child.</param>
     /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>A list of assignments.</returns>
-    [HttpGet("children/{studentId}/assignments")]
+    [HttpGet(ApiRoutes.Parents.ChildAssignments)]
     [ProducesResponseType(typeof(List<AssignmentResponse>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetChildAssignments(Guid studentId, CancellationToken cancellationToken)
     {
@@ -60,7 +61,7 @@ public class ParentsController : ApiController
     /// <param name="studentId">The ID of the child.</param>
     /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>A list of attendance records.</returns>
-    [HttpGet("children/{studentId}/attendance")]
+    [HttpGet(ApiRoutes.Parents.ChildAttendance)]
     [ProducesResponseType(typeof(List<AttendanceResponse>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetChildAttendance(Guid studentId, CancellationToken cancellationToken)
     {

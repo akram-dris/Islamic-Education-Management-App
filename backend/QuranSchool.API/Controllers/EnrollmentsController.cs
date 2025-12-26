@@ -7,7 +7,7 @@ using QuranSchool.Application.Features.Enrollments.Create;
 namespace QuranSchool.API.Controllers;
 
 [Authorize]
-[Route("api/enrollments")]
+[Route(ApiRoutes.Enrollments.BaseRoute)]
 public class EnrollmentsController : ApiController
 {
     private readonly ISender _sender;
@@ -17,7 +17,7 @@ public class EnrollmentsController : ApiController
         _sender = sender;
     }
 
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = RoleNames.Admin)]
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] CreateEnrollmentCommand command, CancellationToken cancellationToken)
     {

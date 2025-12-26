@@ -9,7 +9,7 @@ using QuranSchool.Application.Features.Assignments.GetMy;
 namespace QuranSchool.API.Controllers;
 
 [Authorize]
-[Route("api/assignments")]
+[Route(ApiRoutes.Assignments.BaseRoute)]
 public class AssignmentsController : ApiController
 {
     private readonly ISender _sender;
@@ -25,7 +25,7 @@ public class AssignmentsController : ApiController
     /// <param name="command">The assignment details.</param>
     /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>The created assignment ID.</returns>
-    [Authorize(Roles = "Teacher,Admin")]
+    [Authorize(Roles = RoleNames.TeacherOrAdmin)]
     [HttpPost]
     [ProducesResponseType(typeof(Guid), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
@@ -40,7 +40,7 @@ public class AssignmentsController : ApiController
     /// </summary>
     /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>A list of assignments.</returns>
-    [HttpGet("my")]
+    [HttpGet(ApiRoutes.Assignments.My)]
     [ProducesResponseType(typeof(List<AssignmentResponse>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetMyAssignments(CancellationToken cancellationToken)
     {

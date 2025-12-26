@@ -8,7 +8,7 @@ using QuranSchool.Application.Features.Classes.GetAll;
 namespace QuranSchool.API.Controllers;
 
 [Authorize]
-[Route("api/classes")]
+[Route(ApiRoutes.Classes.BaseRoute)]
 public class ClassesController : ApiController
 {
     private readonly ISender _sender;
@@ -24,7 +24,7 @@ public class ClassesController : ApiController
     /// <param name="command">The class details.</param>
     /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>The created class ID.</returns>
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = RoleNames.Admin)]
     [HttpPost]
     [ProducesResponseType(typeof(Guid), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status409Conflict)]

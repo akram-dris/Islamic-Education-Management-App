@@ -2,6 +2,7 @@ using MediatR;
 using QuranSchool.Application.Abstractions.Persistence;
 using QuranSchool.Domain.Abstractions;
 using QuranSchool.Domain.Entities;
+using QuranSchool.Domain.Errors;
 
 namespace QuranSchool.Application.Features.Enrollments.Create;
 
@@ -18,7 +19,7 @@ public sealed class CreateEnrollmentCommandHandler : IRequestHandler<CreateEnrol
     {
         if (await _enrollmentRepository.ExistsAsync(request.StudentId, request.ClassId, cancellationToken))
         {
-            return Result<Guid>.Failure(Error.Conflict("Enrollment.Duplicate", "Student is already enrolled in this class."));
+            return Result<Guid>.Failure(DomainErrors.Enrollment.Duplicate);
         }
 
         var enrollment = new Enrollment

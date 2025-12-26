@@ -2,6 +2,7 @@ using MediatR;
 using QuranSchool.Application.Abstractions.Authentication;
 using QuranSchool.Application.Abstractions.Persistence;
 using QuranSchool.Domain.Abstractions;
+using QuranSchool.Domain.Errors;
 
 namespace QuranSchool.Application.Features.Auth.Login;
 
@@ -27,14 +28,14 @@ public sealed class LoginCommandHandler : IRequestHandler<LoginCommand, Result<L
 
         if (user is null)
         {
-            return Result<LoginResponse>.Failure(Error.Unauthorized("Auth.InvalidCredentials", "Invalid username or password."));
+            return Result<LoginResponse>.Failure(DomainErrors.Auth.InvalidCredentials);
         }
 
         bool verified = _passwordHasher.Verify(request.Password, user.PasswordHash);
 
         if (!verified)
         {
-            return Result<LoginResponse>.Failure(Error.Unauthorized("Auth.InvalidCredentials", "Invalid username or password."));
+            return Result<LoginResponse>.Failure(DomainErrors.Auth.InvalidCredentials);
         }
 
         string token = _jwtProvider.Generate(user);

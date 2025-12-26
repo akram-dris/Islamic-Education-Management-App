@@ -4,6 +4,7 @@ using Xunit;
 using QuranSchool.Application.Abstractions.Persistence;
 using QuranSchool.Application.Features.Assignments.Create;
 using QuranSchool.Domain.Entities;
+using QuranSchool.Domain.Errors;
 
 namespace QuranSchool.UnitTests.Features.Assignments.Create;
 
@@ -32,6 +33,6 @@ public class CreateAssignmentCommandHandlerTests
 
         // Assert
         result.IsFailure.Should().BeTrue();
-        result.Error.Code.Should().Be("Allocation.NotFound");
+        result.Error.Should().Be(DomainErrors.Allocation.NotFound);
     }
 }

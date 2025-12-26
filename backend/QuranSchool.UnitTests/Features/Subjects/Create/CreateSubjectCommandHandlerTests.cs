@@ -4,6 +4,7 @@ using NSubstitute;
 using Xunit;
 using QuranSchool.Application.Abstractions.Persistence;
 using QuranSchool.Application.Features.Subjects.Create;
+using QuranSchool.Domain.Errors;
 
 namespace QuranSchool.UnitTests.Features.Subjects.Create;
 
@@ -32,6 +33,6 @@ public class CreateSubjectCommandHandlerTests
 
         // Assert
         result.IsFailure.Should().BeTrue();
-        result.Error.Code.Should().Be("Subject.DuplicateName");
+        result.Error.Should().Be(DomainErrors.Subject.DuplicateName);
     }
 }
