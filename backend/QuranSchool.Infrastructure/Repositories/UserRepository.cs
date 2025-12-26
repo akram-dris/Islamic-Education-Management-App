@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using QuranSchool.Application.Abstractions.Persistence;
 using QuranSchool.Domain.Entities;
+using QuranSchool.Domain.Enums;
 using QuranSchool.Infrastructure.Persistence;
 
 namespace QuranSchool.Infrastructure.Repositories;
@@ -29,5 +30,23 @@ public class UserRepository : IUserRepository
     {
         await _dbContext.Users.AddAsync(user, cancellationToken);
         await _dbContext.SaveChangesAsync(cancellationToken);
+    }
+
+    public async Task AddParentStudentLinkAsync(ParentStudent parentStudent, CancellationToken cancellationToken = default)
+    {
+        await _dbContext.ParentStudents.AddAsync(parentStudent, cancellationToken);
+        await _dbContext.SaveChangesAsync(cancellationToken);
+    }
+
+    public async Task<bool> IsParentLinkedAsync(Guid parentId, Guid studentId, CancellationToken cancellationToken = default)
+    {
+        return await _dbContext.ParentStudents.AnyAsync(ps => ps.ParentId == parentId && ps.StudentId == studentId, cancellationToken);
+    }
+
+    public async Task<List<User>> GetAllByRoleAsync(UserRole role, CancellationToken cancellationToken = default)
+    {
+        return await _dbContext.Users
+            .Where(u => u.Role == role)
+            .ToListAsync(cancellationToken);
     }
 }
