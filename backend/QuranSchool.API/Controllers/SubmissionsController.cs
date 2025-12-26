@@ -19,8 +19,16 @@ public class SubmissionsController : ApiController
         _sender = sender;
     }
 
+    /// <summary>
+    /// Submits an assignment for the authenticated student.
+    /// </summary>
+    /// <param name="request">The submission details.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    /// <returns>The created submission ID.</returns>
     [Authorize(Roles = "Student")]
     [HttpPost]
+    [ProducesResponseType(typeof(Guid), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status409Conflict)]
     public async Task<IActionResult> Submit([FromBody] CreateSubmissionRequest request, CancellationToken cancellationToken)
     {
         var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
@@ -38,8 +46,17 @@ public class SubmissionsController : ApiController
         return HandleResult(result);
     }
 
+    /// <summary>
+    /// Grades a student's submission.
+    /// </summary>
+    /// <param name="id">The ID of the submission.</param>
+    /// <param name="request">The grading details.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    /// <returns>No content if successful.</returns>
     [Authorize(Roles = "Teacher,Admin")]
     [HttpPost("{id}/grade")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Grade(Guid id, [FromBody] GradeSubmissionRequest request, CancellationToken cancellationToken)
     {
         var command = new GradeSubmissionCommand(id, request.Grade, request.Remarks);

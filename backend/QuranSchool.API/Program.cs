@@ -14,7 +14,16 @@ builder.Services.AddApplication();
 
 builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
+builder.Services.AddOpenApi(options =>
+{
+    options.AddDocumentTransformer((document, context, cancellationToken) =>
+    {
+        document.Info.Title = "Quran School API";
+        document.Info.Version = "v1";
+        document.Info.Description = "API for managing Quran School academic activities.";
+        return Task.CompletedTask;
+    });
+});
 
 var app = builder.Build();
 
@@ -27,16 +36,13 @@ using (var scope = app.Services.CreateScope())
 }
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+app.MapOpenApi();
+app.MapScalarApiReference(options => 
 {
-    app.MapOpenApi();
-    app.MapScalarApiReference(options => 
-    {
-        options.Title = "Quran School API";
-        options.DefaultHttpClient = new (ScalarTarget.CSharp, ScalarClient.HttpClient);
-        options.CustomCss="";
-    });
-}
+    options.Title = "Quran School API";
+    options.DefaultHttpClient = new (ScalarTarget.CSharp, ScalarClient.HttpClient);
+    options.CustomCss="";
+});
 
 app.UseHttpsRedirection();
 
@@ -46,3 +52,5 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+
+public partial class Program { }

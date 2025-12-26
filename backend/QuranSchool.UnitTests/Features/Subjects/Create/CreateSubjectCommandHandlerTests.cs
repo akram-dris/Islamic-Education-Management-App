@@ -1,4 +1,5 @@
 using FluentAssertions;
+using Microsoft.Extensions.Caching.Memory;
 using NSubstitute;
 using Xunit;
 using QuranSchool.Application.Abstractions.Persistence;
@@ -9,12 +10,14 @@ namespace QuranSchool.UnitTests.Features.Subjects.Create;
 public class CreateSubjectCommandHandlerTests
 {
     private readonly ISubjectRepository _subjectRepositoryMock;
+    private readonly IMemoryCache _cacheMock;
     private readonly CreateSubjectCommandHandler _handler;
 
     public CreateSubjectCommandHandlerTests()
     {
         _subjectRepositoryMock = Substitute.For<ISubjectRepository>();
-        _handler = new CreateSubjectCommandHandler(_subjectRepositoryMock);
+        _cacheMock = Substitute.For<IMemoryCache>();
+        _handler = new CreateSubjectCommandHandler(_subjectRepositoryMock, _cacheMock);
     }
 
     [Fact]

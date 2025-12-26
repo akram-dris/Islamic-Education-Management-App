@@ -21,6 +21,42 @@ public class Result
     public static Result Failure(Error error) => new(false, error);
 }
 
+public interface IValidationResult
+{
+    public static readonly Error ValidationError = new(
+        "ValidationError",
+        "A validation error occurred.",
+        ErrorType.Validation);
+
+    Error[] Errors { get; }
+}
+
+public class ValidationResult : Result, IValidationResult
+{
+    private ValidationResult(Error[] errors)
+        : base(false, IValidationResult.ValidationError)
+    {
+        Errors = errors;
+    }
+
+    public Error[] Errors { get; }
+
+    public static ValidationResult WithErrors(IEnumerable<Error> errors) => new(errors.ToArray());
+}
+
+public class ValidationResult<TValue> : Result<TValue>, IValidationResult
+{
+    private ValidationResult(Error[] errors)
+        : base(default, false, IValidationResult.ValidationError)
+    {
+        Errors = errors;
+    }
+
+    public Error[] Errors { get; }
+
+    public static ValidationResult<TValue> WithErrors(IEnumerable<Error> errors) => new(errors.ToArray());
+}
+
 public class Result<TValue> : Result
 {
     private readonly TValue? _value;

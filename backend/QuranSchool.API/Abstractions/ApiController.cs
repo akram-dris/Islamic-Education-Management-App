@@ -13,6 +13,14 @@ public abstract class ApiController : ControllerBase
             return Ok();
         }
 
+        if (result is IValidationResult validationResult)
+        {
+            return BadRequest(CreateProblemDetails(
+                "Validation Error", 
+                result.Error, 
+                validationResult.Errors));
+        }
+
         return result.Error.Type switch
         {
             ErrorType.Validation => BadRequest(CreateProblemDetails("Validation Error", result.Error)),
@@ -31,6 +39,14 @@ public abstract class ApiController : ControllerBase
             return Ok(result.Value);
         }
 
+        if (result is IValidationResult validationResult)
+        {
+            return BadRequest(CreateProblemDetails(
+                "Validation Error", 
+                result.Error, 
+                validationResult.Errors));
+        }
+
         return result.Error.Type switch
         {
             ErrorType.Validation => BadRequest(CreateProblemDetails("Validation Error", result.Error)),
@@ -42,7 +58,10 @@ public abstract class ApiController : ControllerBase
         };
     }
 
-    private static ProblemDetails CreateProblemDetails(string title, Error error) =>
+    private static ProblemDetails CreateProblemDetails(
+        string title, 
+        Error error,
+        Error[]? errors = null) =>
         new()
         {
             Title = title,
@@ -55,6 +74,7 @@ public abstract class ApiController : ControllerBase
                 ErrorType.Conflict => StatusCodes.Status409Conflict,
                 ErrorType.Unauthorized => StatusCodes.Status401Unauthorized,
                 _ => StatusCodes.Status400BadRequest
-            }
+            },
+            Extensions = { { nameof(errors), errors } }
         };
 }
