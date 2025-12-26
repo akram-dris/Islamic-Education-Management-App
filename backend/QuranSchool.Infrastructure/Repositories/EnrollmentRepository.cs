@@ -20,6 +20,13 @@ public class EnrollmentRepository : IEnrollmentRepository
         await _dbContext.SaveChangesAsync(cancellationToken);
     }
 
+    public async Task<List<Enrollment>> GetByStudentIdAsync(Guid studentId, CancellationToken cancellationToken = default)
+    {
+        return await _dbContext.Enrollments
+            .Where(e => e.StudentId == studentId)
+            .ToListAsync(cancellationToken);
+    }
+
     public async Task<bool> ExistsAsync(Guid studentId, Guid classId, CancellationToken cancellationToken = default)
     {
         return await _dbContext.Enrollments.AnyAsync(e => e.StudentId == studentId && e.ClassId == classId, cancellationToken);

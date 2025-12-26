@@ -10,6 +10,9 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
+using QuranSchool.Application.Abstractions.Storage;
+using QuranSchool.Infrastructure.Storage;
+
 namespace QuranSchool.Infrastructure;
 
 public static class DependencyInjection
@@ -24,6 +27,9 @@ public static class DependencyInjection
         services.AddScoped<ISubjectRepository, SubjectRepository>();
         services.AddScoped<IAllocationRepository, AllocationRepository>();
         services.AddScoped<IEnrollmentRepository, EnrollmentRepository>();
+        services.AddScoped<IAssignmentRepository, AssignmentRepository>();
+        services.AddScoped<ISubmissionRepository, SubmissionRepository>();
+        services.AddScoped<IFileStorage, LocalFileStorage>();
         services.AddSingleton<IPasswordHasher, PasswordHasher>();
         services.AddSingleton<IJwtProvider, JwtProvider>();
 

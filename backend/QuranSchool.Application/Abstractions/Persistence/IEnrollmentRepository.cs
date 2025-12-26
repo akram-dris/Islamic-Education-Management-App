@@ -5,5 +5,6 @@ namespace QuranSchool.Application.Abstractions.Persistence;
 public interface IEnrollmentRepository
 {
     Task AddAsync(Enrollment enrollment, CancellationToken cancellationToken = default);
+    Task<List<Enrollment>> GetByStudentIdAsync(Guid studentId, CancellationToken cancellationToken = default);
     Task<bool> ExistsAsync(Guid studentId, Guid classId, CancellationToken cancellationToken = default);
 }
