@@ -41,6 +41,7 @@ public class ParentsController : ApiController
     /// Retrieves assignments for a specific child.
     /// </summary>
     /// <param name="studentId">The ID of the child.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>A list of assignments.</returns>
     [HttpGet("children/{studentId}/assignments")]
     [ProducesResponseType(typeof(List<AssignmentResponse>), StatusCodes.Status200OK)]
@@ -57,6 +58,7 @@ public class ParentsController : ApiController
     /// Retrieves attendance records for a specific child.
     /// </summary>
     /// <param name="studentId">The ID of the child.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>A list of attendance records.</returns>
     [HttpGet("children/{studentId}/attendance")]
     [ProducesResponseType(typeof(List<AttendanceResponse>), StatusCodes.Status200OK)]
