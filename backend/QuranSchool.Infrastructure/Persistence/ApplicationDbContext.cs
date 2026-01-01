@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
+using Microsoft.EntityFrameworkCore.Query;
 using QuranSchool.Application.Abstractions.Authentication;
 using QuranSchool.Domain.Abstractions;
 using QuranSchool.Domain.Entities;
@@ -37,7 +38,7 @@ public class ApplicationDbContext : DbContext
     {
         var entries = ChangeTracker
             .Entries<Entity>()
-            .Where(e => e.State == EntityState.Added || e.State == EntityState.Modified);
+            .Where(e => e.State == EntityState.Added || e.State == EntityState.Modified || e.State == EntityState.Deleted);
 
         foreach (var entityEntry in entries)
         {
@@ -46,8 +47,15 @@ public class ApplicationDbContext : DbContext
                 entityEntry.Entity.CreatedAt = DateTime.UtcNow;
                 entityEntry.Entity.CreatedBy = _userContext?.UserId;
             }
-            else
+            else if (entityEntry.State == EntityState.Modified)
             {
+                entityEntry.Entity.LastModifiedAt = DateTime.UtcNow;
+                entityEntry.Entity.LastModifiedBy = _userContext?.UserId;
+            }
+            else if (entityEntry.State == EntityState.Deleted)
+            {
+                entityEntry.State = EntityState.Modified;
+                entityEntry.Entity.IsDeleted = true;
                 entityEntry.Entity.LastModifiedAt = DateTime.UtcNow;
                 entityEntry.Entity.LastModifiedBy = _userContext?.UserId;
             }
@@ -60,6 +68,23 @@ public class ApplicationDbContext : DbContext
     {
         base.OnModelCreating(modelBuilder);
 
+        foreach (var entityType in modelBuilder.Model.GetEntityTypes())
+        {
+            if (typeof(Entity).IsAssignableFrom(entityType.ClrType))
+            {
+                modelBuilder.Entity(entityType.ClrType).HasQueryFilter(ConvertFilterExpression<Entity>(e => !e.IsDeleted, entityType.ClrType));
+            }
+        }
+
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(ApplicationDbContext).Assembly);
+    }
+
+    private static System.Linq.Expressions.LambdaExpression ConvertFilterExpression<TInterface>(
+        System.Linq.Expressions.Expression<Func<TInterface, bool>> filterExpression,
+        Type entityType)
+    {
+        var newParam = System.Linq.Expressions.Expression.Parameter(entityType);
+        var newBody = ReplacingExpressionVisitor.Replace(filterExpression.Parameters.Single(), newParam, filterExpression.Body);
+        return System.Linq.Expressions.Expression.Lambda(newBody, newParam);
     }
 }
