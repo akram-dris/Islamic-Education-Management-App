@@ -47,6 +47,12 @@ public class AllocationRepository : IAllocationRepository
         await _dbContext.SaveChangesAsync(cancellationToken);
     }
 
+    public async Task UpdateAsync(Allocation allocation, CancellationToken cancellationToken = default)
+    {
+        _dbContext.Allocations.Update(allocation);
+        await _dbContext.SaveChangesAsync(cancellationToken);
+    }
+
     public async Task<bool> ExistsAsync(Guid teacherId, Guid classId, Guid subjectId, CancellationToken cancellationToken = default)
     {
         return await _dbContext.Allocations.AnyAsync(a => 

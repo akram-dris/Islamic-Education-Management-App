@@ -28,12 +28,10 @@ public sealed class RegisterUserCommandHandler : IRequestHandler<RegisterUserCom
 
         var user = new User
         {
-            Id = Guid.NewGuid(),
             Username = request.Username,
             FullName = request.FullName,
             PasswordHash = _passwordHasher.Hash(request.Password),
-            Role = request.Role,
-            CreatedAt = DateTime.UtcNow
+            Role = request.Role
         };
 
         await _userRepository.AddAsync(user, cancellationToken);

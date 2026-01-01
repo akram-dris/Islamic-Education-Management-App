@@ -40,6 +40,7 @@ public static class DomainErrors
 
     public static class Enrollment
     {
+        public static readonly Error NotFound = Error.NotFound("Enrollment.NotFound", "Enrollment not found.");
         public static readonly Error Duplicate = Error.Conflict("Enrollment.Duplicate", "Student is already enrolled in this class.");
     }
 

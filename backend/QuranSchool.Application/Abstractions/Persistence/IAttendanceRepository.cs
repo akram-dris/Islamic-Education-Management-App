@@ -11,4 +11,7 @@ public interface IAttendanceRepository
     Task<AttendanceRecord?> GetRecordBySessionAndStudentAsync(Guid sessionId, Guid studentId, CancellationToken cancellationToken = default);
     Task<List<AttendanceRecord>> GetRecordsBySessionIdAsync(Guid sessionId, CancellationToken cancellationToken = default);
     Task<List<AttendanceRecord>> GetRecordsByStudentIdAsync(Guid studentId, CancellationToken cancellationToken = default);
+    Task<AttendanceSession?> GetSessionByIdAsync(Guid sessionId, CancellationToken cancellationToken = default);
+    Task UpdateSessionAsync(AttendanceSession session, CancellationToken cancellationToken = default);
+    Task DeleteSessionAsync(AttendanceSession session, CancellationToken cancellationToken = default);
 }

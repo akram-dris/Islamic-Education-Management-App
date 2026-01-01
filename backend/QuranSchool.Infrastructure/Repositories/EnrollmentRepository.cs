@@ -14,9 +14,20 @@ public class EnrollmentRepository : IEnrollmentRepository
         _dbContext = dbContext;
     }
 
+    public async Task<Enrollment?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
+    {
+        return await _dbContext.Enrollments.FindAsync(new object[] { id }, cancellationToken);
+    }
+
     public async Task AddAsync(Enrollment enrollment, CancellationToken cancellationToken = default)
     {
         await _dbContext.Enrollments.AddAsync(enrollment, cancellationToken);
+        await _dbContext.SaveChangesAsync(cancellationToken);
+    }
+
+    public async Task DeleteAsync(Enrollment enrollment, CancellationToken cancellationToken = default)
+    {
+        _dbContext.Enrollments.Remove(enrollment);
         await _dbContext.SaveChangesAsync(cancellationToken);
     }
 

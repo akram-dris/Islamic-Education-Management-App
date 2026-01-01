@@ -42,4 +42,16 @@ public class AssignmentRepository : IAssignmentRepository
         await _dbContext.Assignments.AddAsync(assignment, cancellationToken);
         await _dbContext.SaveChangesAsync(cancellationToken);
     }
+
+    public async Task UpdateAsync(Assignment assignment, CancellationToken cancellationToken = default)
+    {
+        _dbContext.Assignments.Update(assignment);
+        await _dbContext.SaveChangesAsync(cancellationToken);
+    }
+
+    public async Task DeleteAsync(Assignment assignment, CancellationToken cancellationToken = default)
+    {
+        _dbContext.Assignments.Remove(assignment);
+        await _dbContext.SaveChangesAsync(cancellationToken);
+    }
 }

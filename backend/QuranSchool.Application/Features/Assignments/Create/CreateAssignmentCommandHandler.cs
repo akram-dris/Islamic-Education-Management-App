@@ -27,12 +27,10 @@ public sealed class CreateAssignmentCommandHandler : IRequestHandler<CreateAssig
 
         var assignment = new Assignment
         {
-            Id = Guid.NewGuid(),
             AllocationId = request.AllocationId,
             Title = request.Title,
             Description = request.Description,
-            DueDate = request.DueDate,
-            CreatedAt = DateTime.UtcNow
+            DueDate = request.DueDate
         };
 
         await _assignmentRepository.AddAsync(assignment, cancellationToken);

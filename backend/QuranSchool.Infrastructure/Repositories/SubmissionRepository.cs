@@ -33,7 +33,7 @@ public class SubmissionRepository : ISubmissionRepository
         return await _dbContext.Submissions
             .Where(s => s.AssignmentId == assignmentId)
             .Include(s => s.Student)
-            .OrderByDescending(s => s.SubmittedAt)
+            .OrderByDescending(s => s.CreatedAt)
             .ToListAsync(cancellationToken);
     }
 
@@ -46,6 +46,12 @@ public class SubmissionRepository : ISubmissionRepository
     public async Task UpdateAsync(Submission submission, CancellationToken cancellationToken = default)
     {
         _dbContext.Submissions.Update(submission);
+        await _dbContext.SaveChangesAsync(cancellationToken);
+    }
+
+    public async Task DeleteAsync(Submission submission, CancellationToken cancellationToken = default)
+    {
+        _dbContext.Submissions.Remove(submission);
         await _dbContext.SaveChangesAsync(cancellationToken);
     }
 

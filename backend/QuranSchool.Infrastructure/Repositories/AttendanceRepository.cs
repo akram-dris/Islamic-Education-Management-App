@@ -65,4 +65,21 @@ public class AttendanceRepository : IAttendanceRepository
             .OrderByDescending(r => r.AttendanceSession!.SessionDate)
             .ToListAsync(cancellationToken);
     }
+
+    public async Task<AttendanceSession?> GetSessionByIdAsync(Guid sessionId, CancellationToken cancellationToken = default)
+    {
+        return await _dbContext.AttendanceSessions.FindAsync(new object[] { sessionId }, cancellationToken);
+    }
+
+    public async Task UpdateSessionAsync(AttendanceSession session, CancellationToken cancellationToken = default)
+    {
+        _dbContext.AttendanceSessions.Update(session);
+        await _dbContext.SaveChangesAsync(cancellationToken);
+    }
+
+    public async Task DeleteSessionAsync(AttendanceSession session, CancellationToken cancellationToken = default)
+    {
+        _dbContext.AttendanceSessions.Remove(session);
+        await _dbContext.SaveChangesAsync(cancellationToken);
+    }
 }

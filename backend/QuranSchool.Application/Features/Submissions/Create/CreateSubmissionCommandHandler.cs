@@ -37,11 +37,9 @@ public sealed class CreateSubmissionCommandHandler : IRequestHandler<CreateSubmi
 
         var submission = new Submission
         {
-            Id = Guid.NewGuid(),
             AssignmentId = request.AssignmentId,
             StudentId = request.StudentId,
-            FileUrl = request.FileUrl,
-            SubmittedAt = DateTime.UtcNow
+            FileUrl = request.FileUrl
         };
 
         await _submissionRepository.AddAsync(submission, cancellationToken);
