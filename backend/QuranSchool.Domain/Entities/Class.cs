@@ -1,7 +1,8 @@
+using QuranSchool.Domain.Abstractions;
+
 namespace QuranSchool.Domain.Entities;
 
-public class Class
+public class Class : Entity
 {
-    public Guid Id { get; set; }
     public string Name { get; set; } = string.Empty;
 }

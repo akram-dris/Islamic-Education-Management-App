@@ -1,8 +1,9 @@
+using QuranSchool.Domain.Abstractions;
+
 namespace QuranSchool.Domain.Entities;
 
-public class Allocation
+public class Allocation : Entity
 {
-    public Guid Id { get; set; }
     public Guid TeacherId { get; set; }
     public Guid ClassId { get; set; }
     public Guid SubjectId { get; set; }

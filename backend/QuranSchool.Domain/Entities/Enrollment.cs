@@ -1,8 +1,9 @@
+using QuranSchool.Domain.Abstractions;
+
 namespace QuranSchool.Domain.Entities;
 
-public class Enrollment
+public class Enrollment : Entity
 {
-    public Guid Id { get; set; }
     public Guid StudentId { get; set; }
     public Guid ClassId { get; set; }
 

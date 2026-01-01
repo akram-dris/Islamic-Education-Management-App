@@ -7,4 +7,5 @@ public abstract class Entity
     public Guid? CreatedBy { get; set; }
     public DateTime? LastModifiedAt { get; set; }
     public Guid? LastModifiedBy { get; set; }
+    public bool IsDeleted { get; set; } = false;
 }

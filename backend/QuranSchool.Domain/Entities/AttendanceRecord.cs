@@ -1,10 +1,10 @@
+using QuranSchool.Domain.Abstractions;
 using QuranSchool.Domain.Enums;
 
 namespace QuranSchool.Domain.Entities;
 
-public class AttendanceRecord
+public class AttendanceRecord : Entity
 {
-    public Guid Id { get; set; }
     public Guid AttendanceSessionId { get; set; }
     public Guid StudentId { get; set; }
     public AttendanceStatus Status { get; set; }

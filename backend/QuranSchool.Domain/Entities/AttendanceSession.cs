@@ -1,8 +1,9 @@
+using QuranSchool.Domain.Abstractions;
+
 namespace QuranSchool.Domain.Entities;
 
-public class AttendanceSession
+public class AttendanceSession : Entity
 {
-    public Guid Id { get; set; }
     public Guid AllocationId { get; set; }
     public DateOnly SessionDate { get; set; }
 
