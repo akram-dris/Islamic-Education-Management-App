@@ -54,4 +54,44 @@ public class AttendanceController : ApiController
         var result = await _sender.Send(query, cancellationToken);
         return HandleResult(result);
     }
+
+    /// <summary>
+    /// Updates an attendance session.
+    /// </summary>
+    /// <param name="sessionId">The ID of the session to update.</param>
+    /// <param name="request">The update details.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    /// <returns>Success if the update was performed.</returns>
+    [Authorize(Roles = RoleNames.TeacherOrAdmin)]
+    [HttpPut("{sessionId}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> Update(Guid sessionId, [FromBody] UpdateAttendanceRequest request, CancellationToken cancellationToken)
+    {
+        var command = new Application.Features.Attendance.Update.UpdateAttendanceSessionCommand(
+            sessionId,
+            request.Date,
+            request.Records);
+        var result = await _sender.Send(command, cancellationToken);
+        return HandleResult(result);
+    }
+
+    /// <summary>
+    /// Deletes an attendance session.
+    /// </summary>
+    /// <param name="sessionId">The ID of the session to delete.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    /// <returns>Success if the deletion was performed.</returns>
+    [Authorize(Roles = RoleNames.TeacherOrAdmin)]
+    [HttpDelete("{sessionId}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> Delete(Guid sessionId, CancellationToken cancellationToken)
+    {
+        var command = new Application.Features.Attendance.Delete.DeleteAttendanceSessionCommand(sessionId);
+        var result = await _sender.Send(command, cancellationToken);
+        return HandleResult(result);
+    }
 }
+
+public record UpdateAttendanceRequest(DateOnly Date, List<AttendanceRecordDto> Records);

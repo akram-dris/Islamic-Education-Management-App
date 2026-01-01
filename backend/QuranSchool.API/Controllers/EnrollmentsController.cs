@@ -24,4 +24,21 @@ public class EnrollmentsController : ApiController
         var result = await _sender.Send(command, cancellationToken);
         return HandleResult(result);
     }
+
+    /// <summary>
+    /// Unenrolls a student from a class.
+    /// </summary>
+    /// <param name="enrollmentId">The ID of the enrollment to delete.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    /// <returns>Success if the deletion was performed.</returns>
+    [Authorize(Roles = RoleNames.Admin)]
+    [HttpDelete("{enrollmentId}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> Delete(Guid enrollmentId, CancellationToken cancellationToken)
+    {
+        var command = new Application.Features.Enrollments.Delete.DeleteEnrollmentCommand(enrollmentId);
+        var result = await _sender.Send(command, cancellationToken);
+        return HandleResult(result);
+    }
 }

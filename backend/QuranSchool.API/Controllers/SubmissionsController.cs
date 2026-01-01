@@ -63,6 +63,23 @@ public class SubmissionsController : ApiController
         var result = await _sender.Send(command, cancellationToken);
         return HandleResult(result);
     }
+
+    /// <summary>
+    /// Deletes a submission.
+    /// </summary>
+    /// <param name="submissionId">The ID of the submission to delete.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    /// <returns>Success if the deletion was performed.</returns>
+    [Authorize] // Student (owner), Teacher, Admin
+    [HttpDelete("{submissionId}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> Delete(Guid submissionId, CancellationToken cancellationToken)
+    {
+        var command = new Application.Features.Submissions.Delete.DeleteSubmissionCommand(submissionId);
+        var result = await _sender.Send(command, cancellationToken);
+        return HandleResult(result);
+    }
 }
 
 public record CreateSubmissionRequest(Guid AssignmentId, string FileUrl);

@@ -46,4 +46,41 @@ public class SubjectsController : ApiController
         var result = await _sender.Send(new GetAllSubjectsQuery(), cancellationToken);
         return HandleResult(result);
     }
+
+    /// <summary>
+    /// Updates a subject's details.
+    /// </summary>
+    /// <param name="subjectId">The ID of the subject to update.</param>
+    /// <param name="request">The update details.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    /// <returns>Success if the update was performed.</returns>
+    [Authorize(Roles = RoleNames.Admin)]
+    [HttpPut("{subjectId}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> Update(Guid subjectId, [FromBody] UpdateSubjectRequest request, CancellationToken cancellationToken)
+    {
+        var command = new Application.Features.Subjects.Update.UpdateSubjectCommand(subjectId, request.Name);
+        var result = await _sender.Send(command, cancellationToken);
+        return HandleResult(result);
+    }
+
+    /// <summary>
+    /// Deletes a subject.
+    /// </summary>
+    /// <param name="subjectId">The ID of the subject to delete.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    /// <returns>Success if the deletion was performed.</returns>
+    [Authorize(Roles = RoleNames.Admin)]
+    [HttpDelete("{subjectId}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> Delete(Guid subjectId, CancellationToken cancellationToken)
+    {
+        var command = new Application.Features.Subjects.Delete.DeleteSubjectCommand(subjectId);
+        var result = await _sender.Send(command, cancellationToken);
+        return HandleResult(result);
+    }
 }
+
+public record UpdateSubjectRequest(string Name);

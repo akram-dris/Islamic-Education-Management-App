@@ -46,4 +46,41 @@ public class ClassesController : ApiController
         var result = await _sender.Send(new GetAllClassesQuery(), cancellationToken);
         return HandleResult(result);
     }
+
+    /// <summary>
+    /// Updates a class details.
+    /// </summary>
+    /// <param name="classId">The ID of the class to update.</param>
+    /// <param name="request">The update details.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    /// <returns>Success if the update was performed.</returns>
+    [Authorize(Roles = RoleNames.Admin)]
+    [HttpPut("{classId}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> Update(Guid classId, [FromBody] UpdateClassRequest request, CancellationToken cancellationToken)
+    {
+        var command = new Application.Features.Classes.Update.UpdateClassCommand(classId, request.Name);
+        var result = await _sender.Send(command, cancellationToken);
+        return HandleResult(result);
+    }
+
+    /// <summary>
+    /// Deletes a class.
+    /// </summary>
+    /// <param name="classId">The ID of the class to delete.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    /// <returns>Success if the deletion was performed.</returns>
+    [Authorize(Roles = RoleNames.Admin)]
+    [HttpDelete("{classId}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> Delete(Guid classId, CancellationToken cancellationToken)
+    {
+        var command = new Application.Features.Classes.Delete.DeleteClassCommand(classId);
+        var result = await _sender.Send(command, cancellationToken);
+        return HandleResult(result);
+    }
 }
+
+public record UpdateClassRequest(string Name);

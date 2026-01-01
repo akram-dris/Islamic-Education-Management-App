@@ -54,4 +54,45 @@ public class AssignmentsController : ApiController
         var result = await _sender.Send(query, cancellationToken);
         return HandleResult(result);
     }
+
+    /// <summary>
+    /// Updates an assignment.
+    /// </summary>
+    /// <param name="assignmentId">The ID of the assignment to update.</param>
+    /// <param name="request">The update details.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    /// <returns>Success if the update was performed.</returns>
+    [Authorize(Roles = RoleNames.TeacherOrAdmin)]
+    [HttpPut("{assignmentId}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> Update(Guid assignmentId, [FromBody] UpdateAssignmentRequest request, CancellationToken cancellationToken)
+    {
+        var command = new Application.Features.Assignments.Update.UpdateAssignmentCommand(
+            assignmentId,
+            request.Title,
+            request.Description,
+            request.DueDate);
+        var result = await _sender.Send(command, cancellationToken);
+        return HandleResult(result);
+    }
+
+    /// <summary>
+    /// Deletes an assignment.
+    /// </summary>
+    /// <param name="assignmentId">The ID of the assignment to delete.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    /// <returns>Success if the deletion was performed.</returns>
+    [Authorize(Roles = RoleNames.TeacherOrAdmin)]
+    [HttpDelete("{assignmentId}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> Delete(Guid assignmentId, CancellationToken cancellationToken)
+    {
+        var command = new Application.Features.Assignments.Delete.DeleteAssignmentCommand(assignmentId);
+        var result = await _sender.Send(command, cancellationToken);
+        return HandleResult(result);
+    }
 }
+
+public record UpdateAssignmentRequest(string Title, string? Description, DateOnly DueDate);
