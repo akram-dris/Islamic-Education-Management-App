@@ -25,29 +25,49 @@ Enum attendance_status {
 }
 
 ///////////////////////
+// COMMON METADATA (Auditing & Soft Delete)
+///////////////////////
+// All tables include:
+// created_at timestamp [not null]
+// created_by uuid
+// last_modified_at timestamp
+// last_modified_by uuid
+// is_deleted boolean [not null, default: false]
+
+///////////////////////
 // USERS & RELATIONSHIPS
 ///////////////////////
 
 Table users {
   id uuid [pk]
-  username varchar [unique, not null]
+  username varchar [not null]
   password_hash varchar [not null]
   full_name varchar [not null]
   role user_role [not null]
-  created_at timestamp
+  
+  // Metadata
+  created_at timestamp [not null]
+  created_by uuid
+  last_modified_at timestamp
+  last_modified_by uuid
+  is_deleted boolean [not null, default: false]
 }
 
 Table parent_students {
-  parent_id uuid [not null]
-  student_id uuid [not null]
+  id uuid [not null]
+  parent_id uuid [pk, not null]
+  student_id uuid [pk, not null]
 
-  indexes {
-    (parent_id, student_id) [unique]
-  }
+  // Metadata
+  created_at timestamp [not null]
+  created_by uuid
+  last_modified_at timestamp
+  last_modified_by uuid
+  is_deleted boolean [not null, default: false]
 }
 
-Ref: parent_students.parent_id > users.id
-Ref: parent_students.student_id > users.id
+Ref: parent_students.parent_id > users.id [delete: restrict]
+Ref: parent_students.student_id > users.id [delete: cascade]
 
 ///////////////////////
 // ACADEMIC STRUCTURE
@@ -56,11 +76,25 @@ Ref: parent_students.student_id > users.id
 Table classes {
   id uuid [pk]
   name varchar [not null]
+
+  // Metadata
+  created_at timestamp [not null]
+  created_by uuid
+  last_modified_at timestamp
+  last_modified_by uuid
+  is_deleted boolean [not null, default: false]
 }
 
 Table subjects {
   id uuid [pk]
   name varchar [not null]
+
+  // Metadata
+  created_at timestamp [not null]
+  created_by uuid
+  last_modified_at timestamp
+  last_modified_by uuid
+  is_deleted boolean [not null, default: false]
 }
 
 Table allocations {
@@ -72,6 +106,13 @@ Table allocations {
   indexes {
     (teacher_id, class_id, subject_id) [unique]
   }
+
+  // Metadata
+  created_at timestamp [not null]
+  created_by uuid
+  last_modified_at timestamp
+  last_modified_by uuid
+  is_deleted boolean [not null, default: false]
 }
 
 Ref: allocations.teacher_id > users.id
@@ -90,6 +131,13 @@ Table enrollments {
   indexes {
     (student_id, class_id) [unique]
   }
+
+  // Metadata
+  created_at timestamp [not null]
+  created_by uuid
+  last_modified_at timestamp
+  last_modified_by uuid
+  is_deleted boolean [not null, default: false]
 }
 
 Ref: enrollments.student_id > users.id
@@ -105,7 +153,13 @@ Table assignments {
   title varchar [not null]
   description text
   due_date date [not null]
-  created_at timestamp
+
+  // Metadata
+  created_at timestamp [not null]
+  created_by uuid
+  last_modified_at timestamp
+  last_modified_by uuid
+  is_deleted boolean [not null, default: false]
 }
 
 Ref: assignments.allocation_id > allocations.id
@@ -115,13 +169,19 @@ Table submissions {
   assignment_id uuid [not null]
   student_id uuid [not null]
   file_url varchar [not null]
-  submitted_at timestamp
   grade numeric
   remarks text
 
   indexes {
     (assignment_id, student_id) [unique]
   }
+
+  // Metadata
+  created_at timestamp [not null]
+  created_by uuid
+  last_modified_at timestamp
+  last_modified_by uuid
+  is_deleted boolean [not null, default: false]
 }
 
 Ref: submissions.assignment_id > assignments.id
@@ -139,6 +199,13 @@ Table attendance_sessions {
   indexes {
     (allocation_id, session_date) [unique]
   }
+
+  // Metadata
+  created_at timestamp [not null]
+  created_by uuid
+  last_modified_at timestamp
+  last_modified_by uuid
+  is_deleted boolean [not null, default: false]
 }
 
 Ref: attendance_sessions.allocation_id > allocations.id
@@ -152,6 +219,13 @@ Table attendance_records {
   indexes {
     (attendance_session_id, student_id) [unique]
   }
+
+  // Metadata
+  created_at timestamp [not null]
+  created_by uuid
+  last_modified_at timestamp
+  last_modified_by uuid
+  is_deleted boolean [not null, default: false]
 }
 
 Ref: attendance_records.attendance_session_id > attendance_sessions.id

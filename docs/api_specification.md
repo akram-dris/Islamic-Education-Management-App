@@ -1,8 +1,8 @@
- API Specification
+# API Specification
 
 ## Quran & Islamic Education Management App (MVP)
 
-**Base URL:** `/api/v1`  
+**Base URL:** `/api`  
 **Authentication:** JWT (Bearer Token)
 
 All endpoints except login require:
@@ -36,7 +36,7 @@ Authorization: Bearer <token>
   "user": {
     "id": "uuid",
     "fullName": "string",
-    "role": "ADMIN | TEACHER | STUDENT | PARENT"
+    "role": "Admin | Teacher | Student | Parent"
   }
 }
 ```
@@ -45,18 +45,16 @@ Authorization: Bearer <token>
 
 ## 2. Users (Admin Only)
 
-Backed by: `users`
+### Register User
 
-### Create User
-
-**POST** `/users`
+**POST** `/users/register`
 
 ```json
 {
   "username": "string",
   "password": "string",
   "fullName": "string",
-  "role": "ADMIN | TEACHER | STUDENT | PARENT"
+  "role": "Admin | Teacher | Student | Parent"
 }
 ```
 
@@ -64,7 +62,7 @@ Backed by: `users`
 
 ### Get Users
 
-**GET** `/users?role=STUDENT|TEACHER|PARENT`
+**GET** `/users`
 
 ---
 
@@ -81,7 +79,7 @@ Backed by: `users`
 
 ---
 
-### Delete User
+### Delete User (Soft Delete)
 
 **DELETE** `/users/{userId}`
 
@@ -89,11 +87,9 @@ Backed by: `users`
 
 ## 3. Parent ↔ Student Relationship (Admin Only)
 
-Backed by: `parent_students`
-
 ### Link Student to Parent
 
-**POST** `/parents/{parentId}/children`
+**POST** `/users/{parentId}/students`
 
 ```json
 {
@@ -101,141 +97,68 @@ Backed by: `parent_students`
 }
 ```
 
-> One student can be linked to multiple parents.  
-> Duplicate links are not allowed.
-
----
-
-### Unlink Student from Parent
-
-**DELETE** `/parents/{parentId}/children/{studentId}`
-
 ---
 
 ## 4. Academic Structure (Admin Only)
 
 ### Classes
 
-Backed by: `classes`
-
 **POST** `/classes`
-
-```json
-{
-  "name": "string"
-}
-```
-
----
+**PUT** `/classes/{classId}`
+**DELETE** `/classes/{classId}`
 
 ### Subjects
 
-Backed by: `subjects`
-
 **POST** `/subjects`
-
-```json
-{
-  "name": "string"
-}
-```
+**PUT** `/subjects/{subjectId}`
+**DELETE** `/subjects/{subjectId}`
 
 ---
 
 ## 5. Teacher Allocation (Admin Only)
 
-Backed by: `allocations`
-
 ### Assign Teacher to Class & Subject
 
 **POST** `/allocations`
-
-```json
-{
-  "teacherId": "uuid",
-  "classId": "uuid",
-  "subjectId": "uuid"
-}
-```
-
-> Combination of `(teacherId, classId, subjectId)` must be unique.
+**PUT** `/allocations/{allocationId}`
+**DELETE** `/allocations/{allocationId}`
 
 ---
 
 ## 6. Student Enrollment (Admin Only)
 
-Backed by: `enrollments`
-
 ### Enroll Student in Class
 
 **POST** `/enrollments`
-
-```json
-{
-  "studentId": "uuid",
-  "classId": "uuid"
-}
-```
-
-> A student may belong to multiple classes if needed.  
-> Duplicate enrollments are not allowed.
+**DELETE** `/enrollments/{enrollmentId}`
 
 ---
 
 ## 7. Teacher API
 
-Teacher access is restricted by `allocations`.
-
----
-
 ### Get My Teaching Allocations
 
-**GET** `/teacher/my-classes`
-
-**Response**
-
-```json
-[
-  {
-    "allocationId": "uuid",
-    "classId": "uuid",
-    "className": "string",
-    "subjectId": "uuid",
-    "subjectName": "string"
-  }
-]
-```
+**GET** `/allocations` (Filtered by authenticated teacher)
 
 ---
 
-### Create Assignment
-
-Backed by: `assignments`
+### Assignments
 
 **POST** `/assignments`
-
-```json
-{
-  "allocationId": "uuid",
-  "title": "string",
-  "description": "string",
-  "dueDate": "YYYY-MM-DD"
-}
-```
+**PUT** `/assignments/{assignmentId}`
+**DELETE** `/assignments/{assignmentId}`
 
 ---
 
 ### View Assignment Submissions
 
-Backed by: `submissions`
-
-**GET** `/assignments/{assignmentId}/submissions`
+**GET** `/submissions/assignment/{assignmentId}`
 
 ---
 
 ### Grade Submission
 
-**POST** `/submissions/{submissionId}/grade`
+**POST** `/submissions/{id}/grade`
 
 ```json
 {
@@ -244,16 +167,11 @@ Backed by: `submissions`
 }
 ```
 
-> A submission can be graded only once.  
-> Updating grade overwrites the previous value.
-
 ---
 
 ### Record Attendance
 
-Backed by: `attendance_sessions`, `attendance_records`
-
-**POST** `/attendance`
+**POST** `/attendance/mark`
 
 ```json
 {
@@ -262,34 +180,22 @@ Backed by: `attendance_sessions`, `attendance_records`
   "records": [
     {
       "studentId": "uuid",
-      "status": "PRESENT | ABSENT"
+      "status": "Present | Absent"
     }
   ]
 }
 ```
 
-Rules:
-
-- Attendance is per **allocation + date**
-    
-- Duplicate sessions are rejected
-    
-- Each student appears once per session
-    
+**PUT** `/attendance/{sessionId}`
+**DELETE** `/attendance/{sessionId}`
 
 ---
 
 ## 8. Student API
 
-Student access is limited to `student_id = authenticated user`.
-
----
-
 ### Get My Assignments
 
-**GET** `/student/my-assignments`
-
-Returns assignments across enrolled classes and allocations.
+**GET** `/assignments/my`
 
 ---
 
@@ -298,19 +204,9 @@ Returns assignments across enrolled classes and allocations.
 **POST** `/files/upload`  
 `multipart/form-data`
 
-**Response**
-
-```json
-{
-  "fileUrl": "string"
-}
-```
-
 ---
 
 ### Submit Assignment
-
-Backed by: `submissions`
 
 **POST** `/submissions`
 
@@ -321,52 +217,36 @@ Backed by: `submissions`
 }
 ```
 
-> One submission per assignment per student.
-
----
-
-### Get My Grades
-
-**GET** `/student/my-grades`
-
 ---
 
 ### Get My Attendance
 
-**GET** `/student/my-attendance`
+**GET** `/attendance/my`
 
 ---
 
 ## 9. Parent API (Read-Only)
 
-Parent access is filtered via `parent_students`.
-
----
-
 ### Get My Children
 
-**GET** `/parent/children`
+**GET** `/parents/children`
 
 ---
 
 ### View Child Assignments
 
-**GET** `/parent/children/{studentId}/assignments`
+**GET** `/parents/children/{studentId}/assignments`
 
 ---
 
 ### View Child Attendance
 
-**GET** `/parent/children/{studentId}/attendance`
+**GET** `/parents/children/{studentId}/attendance`
 
 ---
 
-## 10. Authorization Rules (Hard Constraints)
+## 10. Common Behavior
 
-|Role|Permissions|
-|---|---|
-|Admin|Full system access|
-|Teacher|Allocated classes only|
-|Student|Own data only|
-|Parent|Read-only linked children|
-
+- **Soft Delete**: All entities use soft delete. `DELETE` requests mark `IsDeleted = true`.
+- **Auditing**: All entities track `CreatedAt`, `CreatedBy`, `LastModifiedAt`, `LastModifiedBy`.
+- **UUIDs**: All primary and foreign keys use UUIDs.

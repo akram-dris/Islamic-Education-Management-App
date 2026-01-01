@@ -25,14 +25,16 @@ The system is designed to scale in complexity **without requiring architectural 
 
 ## 2. Solution Structure
 
-The backend is implemented as **one solution with four projects**:
+The backend is implemented as **one solution with several projects**:
 
 ```text
-QuranSchool.sln
+QuranSchool.slnx
  ├── QuranSchool.Domain
  ├── QuranSchool.Application
  ├── QuranSchool.Infrastructure
- └── QuranSchool.API
+ ├── QuranSchool.API
+ ├── QuranSchool.UnitTests
+ └── QuranSchool.IntegrationTests
 ```
 
 This structure is mandatory to enforce architectural boundaries at compile time.
@@ -79,6 +81,8 @@ Represents the core business model and rules of the system.
 
 - Entities (User, Assignment, Submission, AttendanceSession, etc.)
     
+- Entity Base Class (Auditing: CreatedAt, CreatedBy, LastModifiedAt, LastModifiedBy; Soft Delete: IsDeleted)
+
 - Enums (UserRole, AttendanceStatus)
     
 - Domain rules and invariants

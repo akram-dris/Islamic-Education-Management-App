@@ -10,9 +10,9 @@ As an **Admin**, I have full control over the organizational structure.
   - I want to create accounts for Teachers, Students, and Parents.
   - I want to link Students to their Parents so parents can see the correct data.
 - **Class Organization**:
-  - I want to create Classes (e.g., Level 1, Class A).
-  - I want to create Subjects (Quran, Arabic, Islamic Ed).
-  - I want to assign Teachers to specific Classes and Subjects (e.g., Teacher A -> Class 1 -> Quran).
+  - I want to create, edit, and delete Classes (e.g., Level 1, Class A).
+  - I want to create, edit, and delete Subjects (Quran, Arabic, Islamic Ed).
+  - I want to assign (and unassign) Teachers to specific Classes and Subjects.
 - **Oversight**:
   - I want to view all assignments, grades, and attendance records to monitor school performance.
 
@@ -22,11 +22,12 @@ As a **Teacher**, I want to manage my assigned classroom activities efficiently.
 
 - **Assignment Management**:
   - I want to see only the classes and subjects assigned to me.
-  - I want to create and publish assignments with instructions and deadlines.
+  - I want to create, edit, and delete assignments with instructions and deadlines.
   - I want to view student submissions for my assignments.
   - I want to grade submissions and add optional text remarks.
 - **Attendance**:
   - I want to take attendance for my classes to track student presence.
+  - I want to correct attendance records if I made a mistake.
 
 ### 3. Student
 
