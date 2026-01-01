@@ -26,11 +26,14 @@ public sealed class CreateSubjectCommandHandler : IRequestHandler<CreateSubjectC
             return Result<Guid>.Failure(DomainErrors.Subject.DuplicateName);
         }
 
-        var subject = new Subject
+        var subjectResult = Subject.Create(request.Name);
+
+        if (subjectResult.IsFailure)
         {
-            Id = Guid.NewGuid(),
-            Name = request.Name
-        };
+            return Result<Guid>.Failure(subjectResult.Error);
+        }
+
+        var subject = subjectResult.Value;
 
         await _subjectRepository.AddAsync(subject, cancellationToken);
 

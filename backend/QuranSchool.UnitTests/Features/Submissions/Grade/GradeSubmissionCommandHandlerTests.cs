@@ -36,9 +36,9 @@ public class GradeSubmissionCommandHandlerTests
         // Arrange
         var teacherId = Guid.NewGuid();
         var otherTeacherId = Guid.NewGuid();
-        var submission = new Submission { AssignmentId = Guid.NewGuid() };
-        var assignment = new Assignment { AllocationId = Guid.NewGuid() };
-        var allocation = new Allocation { TeacherId = otherTeacherId };
+        var allocation = Allocation.Create(otherTeacherId, Guid.NewGuid(), Guid.NewGuid()).Value;
+        var assignment = Assignment.Create(allocation.Id, "Title", "Desc", DateOnly.FromDateTime(DateTime.Now)).Value;
+        var submission = Submission.Create(assignment.Id, Guid.NewGuid(), "File").Value;
 
         _submissionRepositoryMock.GetByIdAsync(Arg.Any<Guid>()).Returns(submission);
         _assignmentRepositoryMock.GetByIdAsync(submission.AssignmentId).Returns(assignment);

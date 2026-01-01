@@ -25,15 +25,18 @@ public sealed class CreateAssignmentCommandHandler : IRequestHandler<CreateAssig
             return Result<Guid>.Failure(DomainErrors.Allocation.NotFound);
         }
 
-        var assignment = new Assignment
+        var assignmentResult = Assignment.Create(
+            request.AllocationId,
+            request.Title,
+            request.Description,
+            request.DueDate);
+
+        if (assignmentResult.IsFailure)
         {
-            Id = Guid.NewGuid(),
-            AllocationId = request.AllocationId,
-            Title = request.Title,
-            Description = request.Description,
-            DueDate = request.DueDate,
-            CreatedAt = DateTime.UtcNow
-        };
+            return Result<Guid>.Failure(assignmentResult.Error);
+        }
+
+        var assignment = assignmentResult.Value;
 
         await _assignmentRepository.AddAsync(assignment, cancellationToken);
 

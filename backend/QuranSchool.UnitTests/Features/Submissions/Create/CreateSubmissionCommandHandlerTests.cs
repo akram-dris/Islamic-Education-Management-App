@@ -26,10 +26,8 @@ public class CreateSubmissionCommandHandlerTests
     {
         // Arrange
         var command = new CreateSubmissionCommand(Guid.NewGuid(), Guid.NewGuid(), "url");
-        _assignmentRepositoryMock.GetByIdAsync(command.AssignmentId).Returns(new Assignment 
-        { 
-            DueDate = DateOnly.FromDateTime(DateTime.Now.AddDays(1)) 
-        });
+        _assignmentRepositoryMock.GetByIdAsync(command.AssignmentId).Returns(
+            Assignment.Create(Guid.NewGuid(), "Title", "Desc", DateOnly.FromDateTime(DateTime.Now.AddDays(1))).Value);
         _submissionRepositoryMock.ExistsAsync(command.StudentId, command.AssignmentId).Returns(true);
 
         // Act

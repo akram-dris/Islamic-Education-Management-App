@@ -13,11 +13,7 @@ public class SubjectRepositoryTests : BaseIntegrationTest
     {
         // Arrange
         var repository = new SubjectRepository(DbContext);
-        var subject = new Subject
-        {
-            Id = Guid.NewGuid(),
-            Name = "Integration Test Subject"
-        };
+        var subject = Subject.Create("Integration Test Subject").Value;
 
         // Act
         await repository.AddAsync(subject, default);

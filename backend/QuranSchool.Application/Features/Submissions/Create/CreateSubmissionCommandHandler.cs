@@ -35,14 +35,18 @@ public sealed class CreateSubmissionCommandHandler : IRequestHandler<CreateSubmi
             return Result<Guid>.Failure(DomainErrors.Submission.AlreadySubmitted);
         }
 
-        var submission = new Submission
+        var submissionResult = Submission.Create(
+            request.AssignmentId,
+            request.StudentId,
+            request.FileUrl);
+
+        if (submissionResult.IsFailure)
         {
-            Id = Guid.NewGuid(),
-            AssignmentId = request.AssignmentId,
-            StudentId = request.StudentId,
-            FileUrl = request.FileUrl,
-            SubmittedAt = DateTime.UtcNow
-        };
+            return Result<Guid>.Failure(submissionResult.Error);
+        }
+
+        var submission = submissionResult.Value;
+        submission.SubmittedAt = DateTime.UtcNow;
 
         await _submissionRepository.AddAsync(submission, cancellationToken);
 

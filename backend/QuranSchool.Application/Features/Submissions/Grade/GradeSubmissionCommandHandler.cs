@@ -41,8 +41,12 @@ public sealed class GradeSubmissionCommandHandler : IRequestHandler<GradeSubmiss
             return Result.Failure(DomainErrors.User.NotAuthorized);
         }
 
-        submission.Grade = request.Grade;
-        submission.Remarks = request.Remarks;
+        var result = submission.GradeSubmission(request.Grade, request.Remarks);
+
+        if (result.IsFailure)
+        {
+            return result;
+        }
 
         await _submissionRepository.UpdateAsync(submission, cancellationToken);
 

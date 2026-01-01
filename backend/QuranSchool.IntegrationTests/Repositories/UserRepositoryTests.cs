@@ -14,15 +14,7 @@ public class UserRepositoryTests : BaseIntegrationTest
     {
         // Arrange
         var repository = new UserRepository(DbContext);
-        var user = new User
-        {
-            Id = Guid.NewGuid(),
-            Username = "testuser",
-            FullName = "Test User",
-            PasswordHash = "hash",
-            Role = UserRole.Student,
-            CreatedAt = DateTime.UtcNow
-        };
+        var user = User.Create("testuser", "hash", "Test User", UserRole.Student).Value;
 
         // Act
         await repository.AddAsync(user, default);
@@ -39,33 +31,13 @@ public class UserRepositoryTests : BaseIntegrationTest
         // Arrange
         var repository = new UserRepository(DbContext);
         
-        var parent = new User
-        {
-            Id = Guid.NewGuid(),
-            Username = "parent_link",
-            FullName = "Parent",
-            PasswordHash = "hash",
-            Role = UserRole.Parent,
-            CreatedAt = DateTime.UtcNow
-        };
+        var parent = User.Create("parent_link", "hash", "Parent", UserRole.Parent).Value;
         await repository.AddAsync(parent);
 
-        var student = new User
-        {
-            Id = Guid.NewGuid(),
-            Username = "student_link",
-            FullName = "Student",
-            PasswordHash = "hash",
-            Role = UserRole.Student,
-            CreatedAt = DateTime.UtcNow
-        };
+        var student = User.Create("student_link", "hash", "Student", UserRole.Student).Value;
         await repository.AddAsync(student);
 
-        var link = new ParentStudent
-        {
-            ParentId = parent.Id,
-            StudentId = student.Id
-        };
+        var link = ParentStudent.Create(parent.Id, student.Id).Value;
 
         // Act
         await repository.AddParentStudentLinkAsync(link, default);

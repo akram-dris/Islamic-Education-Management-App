@@ -26,15 +26,18 @@ public sealed class RegisterUserCommandHandler : IRequestHandler<RegisterUserCom
             return Result<Guid>.Failure(DomainErrors.User.DuplicateUsername);
         }
 
-        var user = new User
+        var userResult = User.Create(
+            request.Username,
+            _passwordHasher.Hash(request.Password),
+            request.FullName,
+            request.Role);
+
+        if (userResult.IsFailure)
         {
-            Id = Guid.NewGuid(),
-            Username = request.Username,
-            FullName = request.FullName,
-            PasswordHash = _passwordHasher.Hash(request.Password),
-            Role = request.Role,
-            CreatedAt = DateTime.UtcNow
-        };
+            return Result<Guid>.Failure(userResult.Error);
+        }
+
+        var user = userResult.Value;
 
         await _userRepository.AddAsync(user, cancellationToken);
 

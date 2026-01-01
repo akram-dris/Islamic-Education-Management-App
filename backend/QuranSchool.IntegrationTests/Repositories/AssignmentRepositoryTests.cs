@@ -20,22 +20,20 @@ public class AssignmentRepositoryTests : BaseIntegrationTest
         var subjectRepo = new SubjectRepository(DbContext);
 
         // Setup Teacher, Class, Subject, and Allocation
-        var teacher = new User { Id = Guid.NewGuid(), Username = "t1", FullName = "T", Role = UserRole.Teacher, PasswordHash = "h" };
+        var teacher = User.Create("t1", "h", "T", UserRole.Teacher).Value;
         await userRepo.AddAsync(teacher);
-        var schoolClass = new Class { Id = Guid.NewGuid(), Name = "C1" };
+        var schoolClass = Class.Create("C1").Value;
         await classRepo.AddAsync(schoolClass);
-        var subject = new Subject { Id = Guid.NewGuid(), Name = "S1" };
+        var subject = Subject.Create("S1").Value;
         await subjectRepo.AddAsync(subject);
-        var allocation = new Allocation { Id = Guid.NewGuid(), TeacherId = teacher.Id, ClassId = schoolClass.Id, SubjectId = subject.Id };
+        var allocation = Allocation.Create(teacher.Id, schoolClass.Id, subject.Id).Value;
         await allocationRepo.AddAsync(allocation);
 
-        var assignment = new Assignment
-        {
-            Id = Guid.NewGuid(),
-            AllocationId = allocation.Id,
-            Title = "Test Assignment",
-            DueDate = DateOnly.FromDateTime(DateTime.Now.AddDays(7))
-        };
+        var assignment = Assignment.Create(
+            allocation.Id,
+            "Test Assignment",
+            null,
+            DateOnly.FromDateTime(DateTime.Now.AddDays(7))).Value;
 
         // Act
         await assignmentRepo.AddAsync(assignment);

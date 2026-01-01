@@ -17,30 +17,13 @@ public class EnrollmentRepositoryTests : BaseIntegrationTest
         var userRepo = new UserRepository(DbContext);
         var classRepo = new ClassRepository(DbContext);
 
-        var student = new User
-        {
-            Id = Guid.NewGuid(),
-            Username = "enrolled_student",
-            FullName = "Enrolled Student",
-            PasswordHash = "hash",
-            Role = UserRole.Student,
-            CreatedAt = DateTime.UtcNow
-        };
+        var student = User.Create("enrolled_student", "hash", "Enrolled Student", UserRole.Student).Value;
         await userRepo.AddAsync(student);
 
-        var schoolClass = new Class
-        {
-            Id = Guid.NewGuid(),
-            Name = "Enrollment Test Class"
-        };
+        var schoolClass = Class.Create("Enrollment Test Class").Value;
         await classRepo.AddAsync(schoolClass);
 
-        var enrollment = new Enrollment
-        {
-            Id = Guid.NewGuid(),
-            StudentId = student.Id,
-            ClassId = schoolClass.Id
-        };
+        var enrollment = Enrollment.Create(student.Id, schoolClass.Id).Value;
 
         // Act
         await enrollmentRepo.AddAsync(enrollment, default);
