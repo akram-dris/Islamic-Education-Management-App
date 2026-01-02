@@ -22,12 +22,7 @@ public sealed class CreateEnrollmentCommandHandler : IRequestHandler<CreateEnrol
             return Result<Guid>.Failure(DomainErrors.Enrollment.Duplicate);
         }
 
-        var enrollment = new Enrollment
-        {
-            Id = Guid.NewGuid(),
-            StudentId = request.StudentId,
-            ClassId = request.ClassId
-        };
+        var enrollment = Enrollment.Create(request.StudentId, request.ClassId).Value;
 
         await _enrollmentRepository.AddAsync(enrollment, cancellationToken);
 

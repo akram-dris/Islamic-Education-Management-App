@@ -36,9 +36,9 @@ public class CreateAllocationCommandHandlerTests
         // Arrange
         var command = new CreateAllocationCommand(Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid());
         
-        _userRepositoryMock.GetByIdAsync(command.TeacherId).Returns(new User { Role = UserRole.Teacher });
-        _classRepositoryMock.GetByIdAsync(command.ClassId).Returns(new Class());
-        _subjectRepositoryMock.GetByIdAsync(command.SubjectId).Returns(new Subject());
+        _userRepositoryMock.GetByIdAsync(command.TeacherId).Returns(User.Create("d", "d", "d", UserRole.Teacher).Value);
+        _classRepositoryMock.GetByIdAsync(command.ClassId).Returns(Class.Create("dummy").Value);
+        _subjectRepositoryMock.GetByIdAsync(command.SubjectId).Returns(Subject.Create("dummy").Value);
         
         _allocationRepositoryMock.ExistsAsync(command.TeacherId, command.ClassId, command.SubjectId)
             .Returns(true);

@@ -39,12 +39,13 @@ public sealed class MarkAttendanceCommandHandler : IRequestHandler<MarkAttendanc
         var session = await _attendanceRepository.GetSessionByAllocationAndDateAsync(request.AllocationId, request.Date, cancellationToken);
         if (session is null)
         {
-            session = new AttendanceSession
+            var sessionResult = AttendanceSession.Create(request.AllocationId, request.Date);
+            if (sessionResult.IsFailure)
             {
-                Id = Guid.NewGuid(),
-                AllocationId = request.AllocationId,
-                SessionDate = request.Date
-            };
+                return Result.Failure(sessionResult.Error);
+            }
+            session = sessionResult.Value;
+            
             await _attendanceRepository.AddSessionAsync(session, cancellationToken);
         }
 
@@ -53,14 +54,17 @@ public sealed class MarkAttendanceCommandHandler : IRequestHandler<MarkAttendanc
             var existingRecord = await _attendanceRepository.GetRecordBySessionAndStudentAsync(session.Id, recordDto.StudentId, cancellationToken);
             if (existingRecord is null)
             {
-                var record = new AttendanceRecord
+                var recordResult = AttendanceRecord.Create(
+                    session.Id,
+                    recordDto.StudentId,
+                    recordDto.Status);
+
+                if (recordResult.IsFailure)
                 {
-                    Id = Guid.NewGuid(),
-                    AttendanceSessionId = session.Id,
-                    StudentId = recordDto.StudentId,
-                    Status = recordDto.Status
-                };
-                await _attendanceRepository.AddRecordAsync(record, cancellationToken);
+                    return Result.Failure(recordResult.Error);
+                }
+
+                await _attendanceRepository.AddRecordAsync(recordResult.Value, cancellationToken);
             }
             else
             {

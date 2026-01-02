@@ -31,7 +31,7 @@ public class RegisterUserCommandHandlerTests
         var command = new RegisterUserCommand("testuser", "password", "Test User", UserRole.Student);
         
         _userRepositoryMock.GetByUsernameAsync(command.Username, Arg.Any<CancellationToken>())
-            .Returns(new User());
+            .Returns(User.Create("d", "d", "d", UserRole.Student).Value);
 
         // Act
         var result = await _handler.Handle(command, default);

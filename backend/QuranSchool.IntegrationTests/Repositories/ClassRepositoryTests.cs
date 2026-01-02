@@ -13,11 +13,7 @@ public class ClassRepositoryTests : BaseIntegrationTest
     {
         // Arrange
         var repository = new ClassRepository(DbContext);
-        var schoolClass = new Class
-        {
-            Id = Guid.NewGuid(),
-            Name = "Integration Test Class"
-        };
+        var schoolClass = Class.Create("Integration Test Class").Value;
 
         // Act
         await repository.AddAsync(schoolClass, default);

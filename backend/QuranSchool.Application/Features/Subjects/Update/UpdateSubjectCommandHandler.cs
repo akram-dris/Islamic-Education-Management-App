@@ -32,7 +32,11 @@ public sealed class UpdateSubjectCommandHandler : IRequestHandler<UpdateSubjectC
             return Result.Failure(DomainErrors.Subject.DuplicateName);
         }
 
-        subject.Name = request.Name;
+        var result = subject.Update(request.Name);
+        if (result.IsFailure)
+        {
+            return result;
+        }
 
         await _subjectRepository.UpdateAsync(subject, cancellationToken);
 

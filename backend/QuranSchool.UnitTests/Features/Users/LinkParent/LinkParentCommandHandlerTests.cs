@@ -25,7 +25,7 @@ public class LinkParentCommandHandlerTests
     {
         // Arrange
         var command = new LinkParentCommand(Guid.NewGuid(), Guid.NewGuid());
-        _userRepositoryMock.GetByIdAsync(command.ParentId).Returns(new User { Role = UserRole.Parent });
+        _userRepositoryMock.GetByIdAsync(command.ParentId).Returns(User.Create("d", "d", "d", UserRole.Parent).Value);
         _userRepositoryMock.GetByIdAsync(command.StudentId).Returns((User?)null);
 
         // Act
@@ -41,8 +41,8 @@ public class LinkParentCommandHandlerTests
     {
         // Arrange
         var command = new LinkParentCommand(Guid.NewGuid(), Guid.NewGuid());
-        _userRepositoryMock.GetByIdAsync(command.ParentId).Returns(new User { Role = UserRole.Parent });
-        _userRepositoryMock.GetByIdAsync(command.StudentId).Returns(new User { Role = UserRole.Student });
+        _userRepositoryMock.GetByIdAsync(command.ParentId).Returns(User.Create("d", "d", "d", UserRole.Parent).Value);
+        _userRepositoryMock.GetByIdAsync(command.StudentId).Returns(User.Create("d", "d", "d", UserRole.Student).Value);
         _userRepositoryMock.IsParentLinkedAsync(command.ParentId, command.StudentId).Returns(true);
 
         // Act

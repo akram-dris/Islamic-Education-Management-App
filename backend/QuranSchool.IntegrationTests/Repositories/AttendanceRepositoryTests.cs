@@ -20,21 +20,16 @@ public class AttendanceRepositoryTests : BaseIntegrationTest
         var subjectRepo = new SubjectRepository(DbContext);
 
         // Setup
-        var teacher = new User { Id = Guid.NewGuid(), Username = "t_att", FullName = "T", Role = UserRole.Teacher, PasswordHash = "h" };
+        var teacher = User.Create("t_att", "h", "T", UserRole.Teacher).Value;
         await userRepo.AddAsync(teacher);
-        var cls = new Class { Id = Guid.NewGuid(), Name = "C_att" };
+        var cls = Class.Create("C_att").Value;
         await classRepo.AddAsync(cls);
-        var sub = new Subject { Id = Guid.NewGuid(), Name = "S_att" };
+        var sub = Subject.Create("S_att").Value;
         await subjectRepo.AddAsync(sub);
-        var alc = new Allocation { Id = Guid.NewGuid(), TeacherId = teacher.Id, ClassId = cls.Id, SubjectId = sub.Id };
+        var alc = Allocation.Create(teacher.Id, cls.Id, sub.Id).Value;
         await allocationRepo.AddAsync(alc);
 
-        var session = new AttendanceSession
-        {
-            Id = Guid.NewGuid(),
-            AllocationId = alc.Id,
-            SessionDate = DateOnly.FromDateTime(DateTime.Now)
-        };
+        var session = AttendanceSession.Create(alc.Id, DateOnly.FromDateTime(DateTime.Now)).Value;
 
         // Act
         await repository.AddSessionAsync(session);

@@ -14,15 +14,11 @@ public static class DbInitializer
 
         if (!await context.Users.AnyAsync(u => u.Role == UserRole.Admin))
         {
-            var admin = new User
-            {
-                Id = Guid.NewGuid(),
-                Username = "admin",
-                FullName = "System Administrator",
-                PasswordHash = passwordHasher.Hash("admin123"), // Default password
-                Role = UserRole.Admin,
-                CreatedAt = DateTime.UtcNow
-            };
+            var admin = User.Create(
+                "admin",
+                passwordHasher.Hash("admin123"),
+                "System Administrator",
+                UserRole.Admin).Value;
 
             await context.Users.AddAsync(admin);
             await context.SaveChangesAsync();

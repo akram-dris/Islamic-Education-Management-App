@@ -35,13 +35,14 @@ public sealed class LinkParentCommandHandler : IRequestHandler<LinkParentCommand
             return Result.Failure(DomainErrors.User.AlreadyLinked);
         }
 
-        var link = new ParentStudent
-        {
-            ParentId = request.ParentId,
-            StudentId = request.StudentId
-        };
+        var linkResult = ParentStudent.Create(request.ParentId, request.StudentId);
 
-        await _userRepository.AddParentStudentLinkAsync(link, cancellationToken);
+        if (linkResult.IsFailure)
+        {
+            return Result.Failure(linkResult.Error);
+        }
+
+        await _userRepository.AddParentStudentLinkAsync(linkResult.Value, cancellationToken);
 
         return Result.Success();
     }

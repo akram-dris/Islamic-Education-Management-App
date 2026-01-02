@@ -32,7 +32,11 @@ public sealed class UpdateClassCommandHandler : IRequestHandler<UpdateClassComma
             return Result.Failure(DomainErrors.Class.DuplicateName);
         }
 
-        @class.Name = request.Name;
+        var result = @class.Update(request.Name);
+        if (result.IsFailure)
+        {
+            return result;
+        }
 
         await _classRepository.UpdateAsync(@class, cancellationToken);
 

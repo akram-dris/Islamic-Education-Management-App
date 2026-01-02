@@ -18,30 +18,16 @@ public class AllocationRepositoryTests : BaseIntegrationTest
         var classRepo = new ClassRepository(DbContext);
         var subjectRepo = new SubjectRepository(DbContext);
 
-        var teacher = new User
-        {
-            Id = Guid.NewGuid(),
-            Username = "teacher_alloc",
-            FullName = "Teacher Alloc",
-            PasswordHash = "hash",
-            Role = UserRole.Teacher,
-            CreatedAt = DateTime.UtcNow
-        };
+        var teacher = User.Create("teacher_alloc", "hash", "Teacher Alloc", UserRole.Teacher).Value;
         await userRepo.AddAsync(teacher);
 
-        var schoolClass = new Class { Id = Guid.NewGuid(), Name = "Alloc Class" };
+        var schoolClass = Class.Create("Alloc Class").Value;
         await classRepo.AddAsync(schoolClass);
 
-        var subject = new Subject { Id = Guid.NewGuid(), Name = "Alloc Subject" };
+        var subject = Subject.Create("Alloc Subject").Value;
         await subjectRepo.AddAsync(subject);
 
-        var allocation = new Allocation
-        {
-            Id = Guid.NewGuid(),
-            TeacherId = teacher.Id,
-            ClassId = schoolClass.Id,
-            SubjectId = subject.Id
-        };
+        var allocation = Allocation.Create(teacher.Id, schoolClass.Id, subject.Id).Value;
 
         // Act
         await allocationRepo.AddAsync(allocation, default);

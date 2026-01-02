@@ -74,9 +74,11 @@ public sealed class UpdateAllocationCommandHandler : IRequestHandler<UpdateAlloc
             }
         }
 
-        allocation.TeacherId = request.TeacherId;
-        allocation.ClassId = request.ClassId;
-        allocation.SubjectId = request.SubjectId;
+        var result = allocation.Update(request.TeacherId, request.ClassId, request.SubjectId);
+        if (result.IsFailure)
+        {
+            return result;
+        }
 
         await _allocationRepository.UpdateAsync(allocation, cancellationToken);
 

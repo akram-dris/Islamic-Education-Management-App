@@ -21,26 +21,20 @@ public class SubmissionRepositoryTests : BaseIntegrationTest
         var subjectRepo = new SubjectRepository(DbContext);
 
         // Setup
-        var student = new User { Id = Guid.NewGuid(), Username = "s1", FullName = "S", Role = UserRole.Student, PasswordHash = "h" };
+        var student = User.Create("s1", "h", "S", UserRole.Student).Value;
         await userRepo.AddAsync(student);
-        var teacher = new User { Id = Guid.NewGuid(), Username = "t2", FullName = "T", Role = UserRole.Teacher, PasswordHash = "h" };
+        var teacher = User.Create("t2", "h", "T", UserRole.Teacher).Value;
         await userRepo.AddAsync(teacher);
-        var cls = new Class { Id = Guid.NewGuid(), Name = "C2" };
+        var cls = Class.Create("C2").Value;
         await classRepo.AddAsync(cls);
-        var sub = new Subject { Id = Guid.NewGuid(), Name = "S2" };
+        var sub = Subject.Create("S2").Value;
         await subjectRepo.AddAsync(sub);
-        var alc = new Allocation { Id = Guid.NewGuid(), TeacherId = teacher.Id, ClassId = cls.Id, SubjectId = sub.Id };
+        var alc = Allocation.Create(teacher.Id, cls.Id, sub.Id).Value;
         await allocationRepo.AddAsync(alc);
-        var asg = new Assignment { Id = Guid.NewGuid(), AllocationId = alc.Id, Title = "A", DueDate = DateOnly.FromDateTime(DateTime.Now) };
+        var asg = Assignment.Create(alc.Id, "A", null, DateOnly.FromDateTime(DateTime.Now)).Value;
         await assignmentRepo.AddAsync(asg);
 
-        var submisson = new Submission
-        {
-            Id = Guid.NewGuid(),
-            AssignmentId = asg.Id,
-            StudentId = student.Id,
-            FileUrl = "url"
-        };
+        var submisson = Submission.Create(asg.Id, student.Id, "url").Value;
 
         // Act
         await submissionRepo.AddAsync(submisson);

@@ -26,11 +26,14 @@ public sealed class CreateClassCommandHandler : IRequestHandler<CreateClassComma
             return Result<Guid>.Failure(DomainErrors.Class.DuplicateName);
         }
 
-        var @class = new Class
+        var classResult = Class.Create(request.Name);
+
+        if (classResult.IsFailure)
         {
-            Id = Guid.NewGuid(),
-            Name = request.Name
-        };
+            return Result<Guid>.Failure(classResult.Error);
+        }
+
+        var @class = classResult.Value;
 
         await _classRepository.AddAsync(@class, cancellationToken);
 

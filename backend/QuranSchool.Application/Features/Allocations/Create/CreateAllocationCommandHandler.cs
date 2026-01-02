@@ -51,13 +51,14 @@ public sealed class CreateAllocationCommandHandler : IRequestHandler<CreateAlloc
             return Result<Guid>.Failure(DomainErrors.Allocation.Duplicate);
         }
 
-        var allocation = new Allocation
+        var allocationResult = Allocation.Create(request.TeacherId, request.ClassId, request.SubjectId);
+
+        if (allocationResult.IsFailure)
         {
-            Id = Guid.NewGuid(),
-            TeacherId = request.TeacherId,
-            ClassId = request.ClassId,
-            SubjectId = request.SubjectId
-        };
+            return Result<Guid>.Failure(allocationResult.Error);
+        }
+
+        var allocation = allocationResult.Value;
 
         await _allocationRepository.AddAsync(allocation, cancellationToken);
 

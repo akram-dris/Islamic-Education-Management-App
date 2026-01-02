@@ -58,9 +58,11 @@ public sealed class UpdateAssignmentCommandHandler : IRequestHandler<UpdateAssig
              // Actually, the requirement said "Teacher wants to manage...".
         }
 
-        assignment.Title = request.Title;
-        assignment.Description = request.Description;
-        assignment.DueDate = request.DueDate;
+        var result = assignment.Update(request.Title, request.Description, request.DueDate);
+        if (result.IsFailure)
+        {
+            return result;
+        }
 
         await _assignmentRepository.UpdateAsync(assignment, cancellationToken);
 

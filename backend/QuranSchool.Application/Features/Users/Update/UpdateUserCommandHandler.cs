@@ -25,11 +25,11 @@ public sealed class UpdateUserCommandHandler : IRequestHandler<UpdateUserCommand
             return Result.Failure(DomainErrors.User.NotFound);
         }
 
-        user.FullName = request.FullName;
-        
-        if (!string.IsNullOrWhiteSpace(request.Password))
+        var result = user.Update(request.FullName, !string.IsNullOrWhiteSpace(request.Password) ? _passwordHasher.Hash(request.Password) : null);
+
+        if (result.IsFailure)
         {
-            user.PasswordHash = _passwordHasher.Hash(request.Password);
+            return result;
         }
 
         await _userRepository.UpdateAsync(user, cancellationToken);

@@ -45,7 +45,7 @@ public class LoginCommandHandlerTests
     {
         // Arrange
         var command = new LoginCommand("user", "wrong_password");
-        var user = new User { Username = "user", PasswordHash = "correct_hash" };
+        var user = User.Create("user", "correct_hash", "User", UserRole.Student).Value;
         _userRepositoryMock.GetByUsernameAsync(command.Username, Arg.Any<CancellationToken>()).Returns(user);
         _passwordHasherMock.Verify(command.Password, user.PasswordHash).Returns(false);
 
