@@ -55,4 +55,23 @@ public class LoginCommandHandlerTests
         // Assert
         result.IsFailure.Should().BeTrue();
     }
+    [Fact]
+    public async Task Handle_ShouldReturnSuccess_WhenCredentialsAreCorrect()
+    {
+        // Arrange
+        var command = new LoginCommand("user", "correct_password");
+        var user = User.Create("user", "hashed_password", "User", UserRole.Student).Value;
+        
+        _userRepositoryMock.GetByUsernameAsync(command.Username, Arg.Any<CancellationToken>()).Returns(user);
+        _passwordHasherMock.Verify(command.Password, user.PasswordHash).Returns(true);
+        _jwtProviderMock.Generate(user).Returns("valid_token");
+
+        // Act
+        var result = await _handler.Handle(command, default);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        result.Value.Should().NotBeNull();
+        result.Value.Token.Should().Be("valid_token");
+    }
 }
