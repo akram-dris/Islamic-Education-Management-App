@@ -3,6 +3,7 @@ using NSubstitute;
 using Xunit;
 using QuranSchool.Application.Abstractions.Persistence;
 using QuranSchool.Application.Features.Enrollments.Create;
+using QuranSchool.Domain.Entities;
 using QuranSchool.Domain.Errors;
 
 namespace QuranSchool.UnitTests.Features.Enrollments.Create;
@@ -19,17 +20,28 @@ public class CreateEnrollmentCommandHandlerTests
     }
 
     [Fact]
-    public async Task Handle_ShouldReturnFailure_WhenEnrollmentAlreadyExists()
+    public async Task Handle_ShouldReturnFailure_WhenAlreadyEnrolled()
     {
-        // Arrange
         var command = new CreateEnrollmentCommand(Guid.NewGuid(), Guid.NewGuid());
-        _enrollmentRepositoryMock.ExistsAsync(command.StudentId, command.ClassId, Arg.Any<CancellationToken>()).Returns(true);
+        
+        _enrollmentRepositoryMock.ExistsAsync(command.StudentId, command.ClassId).Returns(true);
 
-        // Act
         var result = await _handler.Handle(command, default);
 
-        // Assert
         result.IsFailure.Should().BeTrue();
         result.Error.Should().Be(DomainErrors.Enrollment.Duplicate);
+    }
+
+    [Fact]
+    public async Task Handle_ShouldReturnSuccess_WhenDataIsValid()
+    {
+        var command = new CreateEnrollmentCommand(Guid.NewGuid(), Guid.NewGuid());
+        
+        _enrollmentRepositoryMock.ExistsAsync(command.StudentId, command.ClassId).Returns(false);
+
+        var result = await _handler.Handle(command, default);
+
+        result.IsSuccess.Should().BeTrue();
+        await _enrollmentRepositoryMock.Received(1).AddAsync(Arg.Any<Enrollment>(), Arg.Any<CancellationToken>());
     }
 }

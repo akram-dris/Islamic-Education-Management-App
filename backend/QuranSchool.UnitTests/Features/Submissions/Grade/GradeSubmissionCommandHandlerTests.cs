@@ -31,27 +31,72 @@ public class GradeSubmissionCommandHandlerTests
     }
 
     [Fact]
-    public async Task Handle_ShouldReturnFailure_WhenTeacherNotAllocated()
+    public async Task Handle_ShouldReturnFailure_WhenSubmissionNotFound()
     {
-        // Arrange
-        var teacherId = Guid.NewGuid();
-        var otherTeacherId = Guid.NewGuid();
-        var allocation = Allocation.Create(otherTeacherId, Guid.NewGuid(), Guid.NewGuid()).Value;
-        var assignment = Assignment.Create(allocation.Id, "Title", "Desc", DateOnly.FromDateTime(DateTime.Now)).Value;
-        var submission = Submission.Create(assignment.Id, Guid.NewGuid(), "File").Value;
+        var command = new GradeSubmissionCommand(Guid.NewGuid(), 90, "Good");
+        _submissionRepositoryMock.GetByIdAsync(command.SubmissionId).Returns((Submission?)null);
 
-        _submissionRepositoryMock.GetByIdAsync(Arg.Any<Guid>()).Returns(submission);
-        _assignmentRepositoryMock.GetByIdAsync(submission.AssignmentId).Returns(assignment);
-        _allocationRepositoryMock.GetByIdAsync(assignment.AllocationId).Returns(allocation);
-        _userContextMock.UserId.Returns(teacherId);
-
-        var command = new GradeSubmissionCommand(Guid.NewGuid(), 10, "Great");
-
-        // Act
         var result = await _handler.Handle(command, default);
 
-        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Error.Should().Be(DomainErrors.Submission.NotFound);
+    }
+
+    [Fact]
+    public async Task Handle_ShouldReturnFailure_WhenUserNotAuthorized()
+    {
+        var command = new GradeSubmissionCommand(Guid.NewGuid(), 90, "Good");
+        var submission = Submission.Create(Guid.NewGuid(), Guid.NewGuid(), "url").Value;
+        var assignment = Assignment.Create(Guid.NewGuid(), "T", "D", DateOnly.MaxValue).Value;
+        var allocation = Allocation.Create(Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid()).Value;
+        
+        _submissionRepositoryMock.GetByIdAsync(command.SubmissionId).Returns(submission);
+        _assignmentRepositoryMock.GetByIdAsync(submission.AssignmentId).Returns(assignment);
+        _allocationRepositoryMock.GetByIdAsync(assignment.AllocationId).Returns(allocation);
+        _userContextMock.UserId.Returns(Guid.NewGuid()); // Not the teacher
+
+        var result = await _handler.Handle(command, default);
+
         result.IsFailure.Should().BeTrue();
         result.Error.Should().Be(DomainErrors.User.NotAuthorized);
+    }
+
+    [Fact]
+    public async Task Handle_ShouldReturnFailure_WhenGradeIsInvalid()
+    {
+        var command = new GradeSubmissionCommand(Guid.NewGuid(), 110, "Invalid");
+        var submission = Submission.Create(Guid.NewGuid(), Guid.NewGuid(), "url").Value;
+        var assignment = Assignment.Create(Guid.NewGuid(), "T", "D", DateOnly.MaxValue).Value;
+        var allocation = Allocation.Create(Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid()).Value;
+
+        _submissionRepositoryMock.GetByIdAsync(command.SubmissionId).Returns(submission);
+        _assignmentRepositoryMock.GetByIdAsync(submission.AssignmentId).Returns(assignment);
+        _allocationRepositoryMock.GetByIdAsync(assignment.AllocationId).Returns(allocation);
+        _userContextMock.UserId.Returns(allocation.TeacherId);
+
+        var result = await _handler.Handle(command, default);
+
+        result.IsFailure.Should().BeTrue();
+        result.Error.Should().Be(DomainErrors.Submission.InvalidGrade);
+    }
+
+    [Fact]
+    public async Task Handle_ShouldReturnSuccess_WhenDataIsValid()
+    {
+        var command = new GradeSubmissionCommand(Guid.NewGuid(), 95, "Excellent");
+        var submission = Submission.Create(Guid.NewGuid(), Guid.NewGuid(), "url").Value;
+        var assignment = Assignment.Create(Guid.NewGuid(), "T", "D", DateOnly.MaxValue).Value;
+        var allocation = Allocation.Create(Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid()).Value;
+
+        _submissionRepositoryMock.GetByIdAsync(command.SubmissionId).Returns(submission);
+        _assignmentRepositoryMock.GetByIdAsync(submission.AssignmentId).Returns(assignment);
+        _allocationRepositoryMock.GetByIdAsync(assignment.AllocationId).Returns(allocation);
+        _userContextMock.UserId.Returns(allocation.TeacherId);
+
+        var result = await _handler.Handle(command, default);
+
+        result.IsSuccess.Should().BeTrue();
+        submission.Grade.Should().Be(95);
+        await _submissionRepositoryMock.Received(1).UpdateAsync(submission, Arg.Any<CancellationToken>());
     }
 }

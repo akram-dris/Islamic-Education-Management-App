@@ -10,26 +10,46 @@ namespace QuranSchool.IntegrationTests.Repositories;
 public class EnrollmentRepositoryTests : BaseIntegrationTest
 {
     [Fact]
-    public async Task AddAsync_ShouldSaveEnrollmentToDatabase()
+    public async Task AddAsync_ShouldSaveEnrollment()
     {
-        // Arrange
-        var enrollmentRepo = new EnrollmentRepository(DbContext);
-        var userRepo = new UserRepository(DbContext);
-        var classRepo = new ClassRepository(DbContext);
+        var repo = new EnrollmentRepository(DbContext);
+        var student = await CreateStudent();
+        var @class = await CreateClass();
+        var enrollment = Enrollment.Create(student.Id, @class.Id).Value;
 
-        var student = User.Create("enrolled_student", "hash", "Enrolled Student", UserRole.Student).Value;
-        await userRepo.AddAsync(student);
+        await repo.AddAsync(enrollment);
 
-        var schoolClass = Class.Create("Enrollment Test Class").Value;
-        await classRepo.AddAsync(schoolClass);
+        var result = await repo.GetByIdAsync(enrollment.Id);
+        result.Should().NotBeNull();
+    }
 
-        var enrollment = Enrollment.Create(student.Id, schoolClass.Id).Value;
+    [Fact]
+    public async Task GetByStudentIdAsync_ShouldReturnEnrollments()
+    {
+        var repo = new EnrollmentRepository(DbContext);
+        var student = await CreateStudent();
+        var @class = await CreateClass();
+        var enrollment = Enrollment.Create(student.Id, @class.Id).Value;
+        await repo.AddAsync(enrollment);
 
-        // Act
-        await enrollmentRepo.AddAsync(enrollment, default);
+        var result = await repo.GetByStudentIdAsync(student.Id);
 
-        // Assert
-        var exists = await enrollmentRepo.ExistsAsync(student.Id, schoolClass.Id);
-        exists.Should().BeTrue();
+        result.Should().Contain(e => e.Id == enrollment.Id);
+    }
+
+    private async Task<User> CreateStudent()
+    {
+        var user = User.Create(Guid.NewGuid().ToString(), "h", "S", UserRole.Student).Value;
+        DbContext.Set<User>().Add(user);
+        await DbContext.SaveChangesAsync();
+        return user;
+    }
+
+    private async Task<Class> CreateClass()
+    {
+        var @class = Class.Create(Guid.NewGuid().ToString()).Value;
+        DbContext.Set<Class>().Add(@class);
+        await DbContext.SaveChangesAsync();
+        return @class;
     }
 }

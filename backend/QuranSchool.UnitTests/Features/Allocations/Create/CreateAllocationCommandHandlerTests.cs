@@ -31,14 +31,84 @@ public class CreateAllocationCommandHandlerTests
     }
 
     [Fact]
+    public async Task Handle_ShouldReturnFailure_WhenTeacherNotFound()
+    {
+        // Arrange
+        var command = new CreateAllocationCommand(Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid());
+        _userRepositoryMock.GetByIdAsync(command.TeacherId).Returns((User?)null);
+
+        // Act
+        var result = await _handler.Handle(command, default);
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Error.Should().Be(DomainErrors.User.TeacherNotFound);
+    }
+
+    [Fact]
+    public async Task Handle_ShouldReturnFailure_WhenUserIsNotTeacher()
+    {
+        // Arrange
+        var command = new CreateAllocationCommand(Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid());
+        var user = User.Create("parent", "hash", "Parent", UserRole.Parent).Value;
+        _userRepositoryMock.GetByIdAsync(command.TeacherId).Returns(user);
+
+        // Act
+        var result = await _handler.Handle(command, default);
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Error.Should().Be(DomainErrors.User.TeacherNotFound);
+    }
+
+    [Fact]
+    public async Task Handle_ShouldReturnFailure_WhenClassNotFound()
+    {
+        // Arrange
+        var command = new CreateAllocationCommand(Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid());
+        var teacher = User.Create("teacher", "hash", "Teacher", UserRole.Teacher).Value;
+        _userRepositoryMock.GetByIdAsync(command.TeacherId).Returns(teacher);
+        _classRepositoryMock.GetByIdAsync(command.ClassId).Returns((Class?)null);
+
+        // Act
+        var result = await _handler.Handle(command, default);
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Error.Should().Be(DomainErrors.Class.NotFound);
+    }
+
+    [Fact]
+    public async Task Handle_ShouldReturnFailure_WhenSubjectNotFound()
+    {
+        // Arrange
+        var command = new CreateAllocationCommand(Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid());
+        var teacher = User.Create("teacher", "hash", "Teacher", UserRole.Teacher).Value;
+        var @class = Class.Create("Class").Value;
+        _userRepositoryMock.GetByIdAsync(command.TeacherId).Returns(teacher);
+        _classRepositoryMock.GetByIdAsync(command.ClassId).Returns(@class);
+        _subjectRepositoryMock.GetByIdAsync(command.SubjectId).Returns((Subject?)null);
+
+        // Act
+        var result = await _handler.Handle(command, default);
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Error.Should().Be(DomainErrors.Subject.NotFound);
+    }
+
+    [Fact]
     public async Task Handle_ShouldReturnFailure_WhenAllocationAlreadyExists()
     {
         // Arrange
         var command = new CreateAllocationCommand(Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid());
+        var teacher = User.Create("teacher", "hash", "Teacher", UserRole.Teacher).Value;
+        var @class = Class.Create("Class").Value;
+        var subject = Subject.Create("Subject").Value;
         
-        _userRepositoryMock.GetByIdAsync(command.TeacherId).Returns(User.Create("d", "d", "d", UserRole.Teacher).Value);
-        _classRepositoryMock.GetByIdAsync(command.ClassId).Returns(Class.Create("dummy").Value);
-        _subjectRepositoryMock.GetByIdAsync(command.SubjectId).Returns(Subject.Create("dummy").Value);
+        _userRepositoryMock.GetByIdAsync(command.TeacherId).Returns(teacher);
+        _classRepositoryMock.GetByIdAsync(command.ClassId).Returns(@class);
+        _subjectRepositoryMock.GetByIdAsync(command.SubjectId).Returns(subject);
         
         _allocationRepositoryMock.ExistsAsync(command.TeacherId, command.ClassId, command.SubjectId)
             .Returns(true);
@@ -49,5 +119,29 @@ public class CreateAllocationCommandHandlerTests
         // Assert
         result.IsFailure.Should().BeTrue();
         result.Error.Should().Be(DomainErrors.Allocation.Duplicate);
+    }
+
+    [Fact]
+    public async Task Handle_ShouldReturnSuccess_WhenAllocationIsValid()
+    {
+        // Arrange
+        var command = new CreateAllocationCommand(Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid());
+        var teacher = User.Create("teacher", "hash", "Teacher", UserRole.Teacher).Value;
+        var @class = Class.Create("Class").Value;
+        var subject = Subject.Create("Subject").Value;
+        
+        _userRepositoryMock.GetByIdAsync(command.TeacherId).Returns(teacher);
+        _classRepositoryMock.GetByIdAsync(command.ClassId).Returns(@class);
+        _subjectRepositoryMock.GetByIdAsync(command.SubjectId).Returns(subject);
+        
+        _allocationRepositoryMock.ExistsAsync(command.TeacherId, command.ClassId, command.SubjectId)
+            .Returns(false);
+
+        // Act
+        var result = await _handler.Handle(command, default);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        await _allocationRepositoryMock.Received(1).AddAsync(Arg.Any<Allocation>(), Arg.Any<CancellationToken>());
     }
 }

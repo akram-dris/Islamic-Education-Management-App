@@ -9,17 +9,39 @@ namespace QuranSchool.IntegrationTests.Repositories;
 public class SubjectRepositoryTests : BaseIntegrationTest
 {
     [Fact]
-    public async Task AddAsync_ShouldSaveSubjectToDatabase()
+    public async Task AddAsync_ShouldSaveSubject()
     {
-        // Arrange
-        var repository = new SubjectRepository(DbContext);
-        var subject = Subject.Create("Integration Test Subject").Value;
+        var repo = new SubjectRepository(DbContext);
+        var subject = Subject.Create("Subject 1").Value;
 
-        // Act
-        await repository.AddAsync(subject, default);
+        await repo.AddAsync(subject);
 
-        // Assert
-        var exists = await repository.ExistsAsync(subject.Name);
-        exists.Should().BeTrue();
+        var result = await repo.GetByIdAsync(subject.Id);
+        result.Should().NotBeNull();
+        result!.Name.Should().Be("Subject 1");
+    }
+
+    [Fact]
+    public async Task ExistsAsync_ShouldReturnTrue_WhenExists()
+    {
+        var repo = new SubjectRepository(DbContext);
+        var subject = Subject.Create("Exists").Value;
+        await repo.AddAsync(subject);
+
+        var result = await repo.ExistsAsync("Exists");
+
+        result.Should().BeTrue();
+    }
+
+    [Fact]
+    public async Task GetAllAsync_ShouldReturnAllSubjects()
+    {
+        var repo = new SubjectRepository(DbContext);
+        await repo.AddAsync(Subject.Create("S1").Value);
+        await repo.AddAsync(Subject.Create("S2").Value);
+
+        var result = await repo.GetAllAsync();
+
+        result.Should().HaveCountGreaterOrEqualTo(2);
     }
 }

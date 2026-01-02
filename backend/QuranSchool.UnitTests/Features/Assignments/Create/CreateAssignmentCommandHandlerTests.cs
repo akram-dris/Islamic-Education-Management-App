@@ -26,7 +26,8 @@ public class CreateAssignmentCommandHandlerTests
     {
         // Arrange
         var command = new CreateAssignmentCommand(Guid.NewGuid(), "Title", "Desc", DateOnly.FromDateTime(DateTime.Now));
-        _allocationRepositoryMock.GetByIdAsync(command.AllocationId).Returns((Allocation?)null);
+        _allocationRepositoryMock.GetByIdAsync(command.AllocationId, Arg.Any<CancellationToken>())
+            .Returns((Allocation?)null);
 
         // Act
         var result = await _handler.Handle(command, default);
@@ -34,5 +35,39 @@ public class CreateAssignmentCommandHandlerTests
         // Assert
         result.IsFailure.Should().BeTrue();
         result.Error.Should().Be(DomainErrors.Allocation.NotFound);
+    }
+
+    [Fact]
+    public async Task Handle_ShouldReturnFailure_WhenAssignmentCreateFails()
+    {
+        // Arrange
+        var command = new CreateAssignmentCommand(Guid.NewGuid(), "", "Desc", DateOnly.FromDateTime(DateTime.Now)); // Empty title
+        var allocation = Allocation.Create(Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid()).Value;
+        _allocationRepositoryMock.GetByIdAsync(command.AllocationId, Arg.Any<CancellationToken>())
+            .Returns(allocation);
+
+        // Act
+        var result = await _handler.Handle(command, default);
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Error.Should().Be(DomainErrors.Assignment.EmptyTitle);
+    }
+
+    [Fact]
+    public async Task Handle_ShouldReturnSuccess_WhenDataIsValid()
+    {
+        // Arrange
+        var command = new CreateAssignmentCommand(Guid.NewGuid(), "Title", "Desc", DateOnly.FromDateTime(DateTime.Now));
+        var allocation = Allocation.Create(Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid()).Value;
+        _allocationRepositoryMock.GetByIdAsync(command.AllocationId, Arg.Any<CancellationToken>())
+            .Returns(allocation);
+
+        // Act
+        var result = await _handler.Handle(command, default);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        await _assignmentRepositoryMock.Received(1).AddAsync(Arg.Any<Assignment>(), Arg.Any<CancellationToken>());
     }
 }
