@@ -1,0 +1,8 @@
+<Solution>
+  <Project Path="QuranSchool.API/QuranSchool.API.csproj" />
+  <Project Path="QuranSchool.Application/QuranSchool.Application.csproj" />
+  <Project Path="QuranSchool.Domain/QuranSchool.Domain.csproj" />
+  <Project Path="QuranSchool.Infrastructure/QuranSchool.Infrastructure.csproj" />
+  <Project Path="QuranSchool.UnitTests/QuranSchool.UnitTests.csproj" />
+  <Project Path="QuranSchool.IntegrationTests/QuranSchool.IntegrationTests.csproj" />
+</Solution>
