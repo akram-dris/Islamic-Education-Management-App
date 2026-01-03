@@ -15,7 +15,7 @@ public abstract class ApiController : ControllerBase
             return Ok();
         }
 
-        if (result is IValidationResult validationResult)
+        if (result.IsFailure && result is IValidationResult validationResult)
         {
             return BadRequest(CreateProblemDetails(
                 "Validation Error", 

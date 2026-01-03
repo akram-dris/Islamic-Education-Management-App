@@ -6,7 +6,8 @@ public static class ApiRoutes
 
     public static class Auth
     {
-        public const string Login = $"{Base}/auth/login";
+        public const string BaseRoute = $"{Base}/auth";
+        public const string Login = "login";
     }
 
     public static class Users

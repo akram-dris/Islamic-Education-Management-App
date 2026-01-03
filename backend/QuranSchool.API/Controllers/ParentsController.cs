@@ -31,9 +31,13 @@ public class ParentsController : ApiController
     public async Task<IActionResult> GetMyChildren(CancellationToken cancellationToken)
     {
         var parentIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
-        if (parentIdClaim == null) return Unauthorized();
+        if (parentIdClaim == null)
+            return Unauthorized();
 
-        var query = new GetChildrenQuery(Guid.Parse(parentIdClaim.Value));
+        if (!Guid.TryParse(parentIdClaim.Value, out var parentId)) 
+            return Unauthorized();
+
+        var query = new GetChildrenQuery(parentId);
         var result = await _sender.Send(query, cancellationToken);
         return HandleResult(result);
     }

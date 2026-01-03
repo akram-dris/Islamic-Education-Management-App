@@ -24,7 +24,7 @@ public class GlobalExceptionHandler : IExceptionHandler
             Status = StatusCodes.Status500InternalServerError,
             Title = "Server Error",
             Type = "https://tools.ietf.org/html/rfc7231#section-6.6.1",
-            Detail = "An unexpected error occurred on the server."
+            Detail = exception.InnerException?.Message ?? exception.Message // FOR DEBUGGING
         };
 
         httpContext.Response.StatusCode = problemDetails.Status.Value;

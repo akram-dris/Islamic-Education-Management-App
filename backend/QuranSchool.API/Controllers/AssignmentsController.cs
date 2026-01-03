@@ -50,7 +50,12 @@ public class AssignmentsController : ApiController
             return Unauthorized();
         }
 
-        var query = new GetMyAssignmentsQuery(Guid.Parse(userIdClaim.Value));
+        if (!Guid.TryParse(userIdClaim.Value, out var userId))
+        {
+            return Unauthorized();
+        }
+
+        var query = new GetMyAssignmentsQuery(userId);
         var result = await _sender.Send(query, cancellationToken);
         return HandleResult(result);
     }

@@ -28,18 +28,20 @@ public class SubmissionsController : ApiController
     [Authorize(Roles = RoleNames.Student)]
     [HttpPost]
     [ProducesResponseType(typeof(Guid), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status409Conflict)]
     public async Task<IActionResult> Submit([FromBody] CreateSubmissionRequest request, CancellationToken cancellationToken)
     {
-        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+        var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier);
         if (userIdClaim == null)
-        {
             return Unauthorized();
-        }
+
+        if (!Guid.TryParse(userIdClaim.Value, out var userId))
+            return Unauthorized();
 
         var command = new CreateSubmissionCommand(
             request.AssignmentId,
-            Guid.Parse(userIdClaim.Value),
+            userId,
             request.FileUrl);
 
         var result = await _sender.Send(command, cancellationToken);

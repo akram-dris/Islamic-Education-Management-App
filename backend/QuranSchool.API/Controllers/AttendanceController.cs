@@ -27,7 +27,7 @@ public class AttendanceController : ApiController
     /// <returns>No content if successful.</returns>
     [Authorize(Roles = RoleNames.TeacherOrAdmin)]
     [HttpPost(ApiRoutes.Attendance.Mark)]
-    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(Guid), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Mark([FromBody] MarkAttendanceCommand command, CancellationToken cancellationToken)
     {
@@ -50,7 +50,12 @@ public class AttendanceController : ApiController
             return Unauthorized();
         }
 
-        var query = new GetMyAttendanceQuery(Guid.Parse(userIdClaim.Value));
+        if (!Guid.TryParse(userIdClaim.Value, out var userId))
+        {
+            return Unauthorized();
+        }
+
+        var query = new GetMyAttendanceQuery(userId);
         var result = await _sender.Send(query, cancellationToken);
         return HandleResult(result);
     }
