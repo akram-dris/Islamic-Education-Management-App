@@ -19,7 +19,6 @@ public class Submission : Entity
     public Guid AssignmentId { get; private set; }
     public Guid StudentId { get; private set; }
     public string FileUrl { get; private set; } = string.Empty;
-    public DateTime SubmittedAt { get; set; } = DateTime.UtcNow;
     public decimal? Grade { get; set; }
     public string? Remarks { get; set; }
 

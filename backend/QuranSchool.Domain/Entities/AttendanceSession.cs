@@ -32,6 +32,11 @@ public class AttendanceSession : Entity
 
     public Result Update(DateOnly sessionDate)
     {
+        if (sessionDate == default)
+        {
+            return Result.Failure(DomainErrors.AttendanceSession.InvalidDate);
+        }
+
         SessionDate = sessionDate;
         return Result.Success();
     }

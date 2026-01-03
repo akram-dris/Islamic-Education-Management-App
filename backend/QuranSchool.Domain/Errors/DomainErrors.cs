@@ -78,6 +78,7 @@ public static class DomainErrors
     {
         public static readonly Error NotFound = Error.NotFound("AttendanceSession.NotFound", "Attendance session not found.");
         public static readonly Error EmptyAllocationId = Error.Validation("AttendanceSession.EmptyAllocationId", "Allocation ID cannot be empty.");
+        public static readonly Error InvalidDate = Error.Validation("AttendanceSession.InvalidDate", "Invalid session date.");
     }
 
     public static class AttendanceRecord

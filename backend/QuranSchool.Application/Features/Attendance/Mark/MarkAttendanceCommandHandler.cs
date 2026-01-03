@@ -7,7 +7,7 @@ using QuranSchool.Domain.Errors;
 
 namespace QuranSchool.Application.Features.Attendance.Mark;
 
-public sealed class MarkAttendanceCommandHandler : IRequestHandler<MarkAttendanceCommand, Result>
+public sealed class MarkAttendanceCommandHandler : IRequestHandler<MarkAttendanceCommand, Result<Guid>>
 {
     private readonly IAttendanceRepository _attendanceRepository;
     private readonly IAllocationRepository _allocationRepository;
@@ -23,17 +23,17 @@ public sealed class MarkAttendanceCommandHandler : IRequestHandler<MarkAttendanc
         _userContext = userContext;
     }
 
-    public async Task<Result> Handle(MarkAttendanceCommand request, CancellationToken cancellationToken)
+    public async Task<Result<Guid>> Handle(MarkAttendanceCommand request, CancellationToken cancellationToken)
     {
         var allocation = await _allocationRepository.GetByIdAsync(request.AllocationId, cancellationToken);
         if (allocation is null)
         {
-            return Result.Failure(DomainErrors.Allocation.NotFound);
+            return Result<Guid>.Failure(DomainErrors.Allocation.NotFound);
         }
 
         if (allocation.TeacherId != _userContext.UserId)
         {
-            return Result.Failure(DomainErrors.User.NotAuthorized);
+            return Result<Guid>.Failure(DomainErrors.User.NotAuthorized);
         }
 
         var session = await _attendanceRepository.GetSessionByAllocationAndDateAsync(request.AllocationId, request.Date, cancellationToken);
@@ -42,7 +42,7 @@ public sealed class MarkAttendanceCommandHandler : IRequestHandler<MarkAttendanc
             var sessionResult = AttendanceSession.Create(request.AllocationId, request.Date);
             if (sessionResult.IsFailure)
             {
-                return Result.Failure(sessionResult.Error);
+                return Result<Guid>.Failure(sessionResult.Error);
             }
             session = sessionResult.Value;
             
@@ -61,7 +61,7 @@ public sealed class MarkAttendanceCommandHandler : IRequestHandler<MarkAttendanc
 
                 if (recordResult.IsFailure)
                 {
-                    return Result.Failure(recordResult.Error);
+                    return Result<Guid>.Failure(recordResult.Error);
                 }
 
                 await _attendanceRepository.AddRecordAsync(recordResult.Value, cancellationToken);
@@ -73,6 +73,6 @@ public sealed class MarkAttendanceCommandHandler : IRequestHandler<MarkAttendanc
             }
         }
 
-        return Result.Success();
+        return session.Id;
     }
 }

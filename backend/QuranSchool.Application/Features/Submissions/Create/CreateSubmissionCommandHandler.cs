@@ -46,7 +46,6 @@ public sealed class CreateSubmissionCommandHandler : IRequestHandler<CreateSubmi
         }
 
         var submission = submissionResult.Value;
-        submission.SubmittedAt = DateTime.UtcNow;
 
         await _submissionRepository.AddAsync(submission, cancellationToken);
 
