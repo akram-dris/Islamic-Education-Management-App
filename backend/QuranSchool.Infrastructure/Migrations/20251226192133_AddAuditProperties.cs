@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace QuranSchool.Infrastructure.Migrations
 {
     /// <inheritdoc />
+     [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     public partial class AddAuditProperties : Migration
     {
         /// <inheritdoc />

@@ -5,6 +5,7 @@
 namespace QuranSchool.Infrastructure.Migrations
 {
     /// <inheritdoc />
+     [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     public partial class AddGlobalSoftDelete : Migration
     {
         /// <inheritdoc />
