@@ -39,4 +39,28 @@ public class GetAllSubjectsQueryHandlerTests
         result.IsSuccess.Should().BeTrue();
         result.Value.Should().HaveCount(1);
     }
+
+    [Fact]
+    public async Task Handle_ShouldReturnListFromCache_WhenCacheHit()
+    {
+        // Arrange
+        var query = new GetAllSubjectsQuery();
+        var cachedSubjects = new List<SubjectResponse> { new(Guid.NewGuid(), "Cached Subject") };
+        
+        object? outValue = cachedSubjects;
+        _memoryCacheMock.TryGetValue(Arg.Any<object>(), out Arg.Any<object?>())
+            .Returns(x => 
+            {
+                x[1] = outValue;
+                return true;
+            });
+
+        // Act
+        var result = await _handler.Handle(query, default);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        result.Value.Should().BeEquivalentTo(cachedSubjects);
+        await _subjectRepositoryMock.DidNotReceive().GetAllAsync(Arg.Any<CancellationToken>());
+    }
 }

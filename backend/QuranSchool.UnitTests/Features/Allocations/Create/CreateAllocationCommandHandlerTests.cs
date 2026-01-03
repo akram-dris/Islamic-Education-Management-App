@@ -144,4 +144,25 @@ public class CreateAllocationCommandHandlerTests
         result.IsSuccess.Should().BeTrue();
         await _allocationRepositoryMock.Received(1).AddAsync(Arg.Any<Allocation>(), Arg.Any<CancellationToken>());
     }
+
+    [Fact]
+    public async Task Handle_ShouldReturnFailure_WhenDomainCreationFails()
+    {
+        // Arrange
+        var command = new CreateAllocationCommand(Guid.Empty, Guid.NewGuid(), Guid.NewGuid());
+        var teacher = User.Create("teacher", "hash", "Teacher", UserRole.Teacher).Value;
+        var @class = Class.Create("Class").Value;
+        var subject = Subject.Create("Subject").Value;
+        
+        _userRepositoryMock.GetByIdAsync(command.TeacherId).Returns(teacher);
+        _classRepositoryMock.GetByIdAsync(command.ClassId).Returns(@class);
+        _subjectRepositoryMock.GetByIdAsync(command.SubjectId).Returns(subject);
+
+        // Act
+        var result = await _handler.Handle(command, default);
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Error.Should().Be(DomainErrors.Allocation.EmptyTeacherId);
+    }
 }

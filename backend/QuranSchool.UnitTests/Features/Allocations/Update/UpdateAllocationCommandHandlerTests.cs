@@ -179,4 +179,83 @@ public class UpdateAllocationCommandHandlerTests
         result.IsSuccess.Should().BeTrue();
         await _allocationRepositoryMock.Received(1).UpdateAsync(Arg.Is<Allocation>(a => a.TeacherId == command.TeacherId), Arg.Any<CancellationToken>());
     }
+
+    [Fact]
+    public async Task Handle_ShouldReturnSuccess_WhenUpdatingTeacherOnly()
+    {
+        // Arrange
+        var allocation = Allocation.Create(Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid()).Value;
+        var newTeacherId = Guid.NewGuid();
+        var command = new UpdateAllocationCommand(Guid.NewGuid(), newTeacherId, allocation.ClassId, allocation.SubjectId);
+        var newTeacher = User.Create("t", "h", "T", UserRole.Teacher).Value;
+
+        _allocationRepositoryMock.GetByIdAsync(command.AllocationId, Arg.Any<CancellationToken>()).Returns(allocation);
+        _userRepositoryMock.GetByIdAsync(newTeacherId, Arg.Any<CancellationToken>()).Returns(newTeacher);
+        
+        // Act
+        var result = await _handler.Handle(command, default);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+    }
+
+    [Fact]
+    public async Task Handle_ShouldReturnSuccess_WhenUpdatingClassOnly()
+    {
+        // Arrange
+        var allocation = Allocation.Create(Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid()).Value;
+        var newClassId = Guid.NewGuid();
+        var command = new UpdateAllocationCommand(Guid.NewGuid(), allocation.TeacherId, newClassId, allocation.SubjectId);
+        var newClass = Class.Create("C").Value;
+
+        _allocationRepositoryMock.GetByIdAsync(command.AllocationId, Arg.Any<CancellationToken>()).Returns(allocation);
+        _classRepositoryMock.GetByIdAsync(newClassId, Arg.Any<CancellationToken>()).Returns(newClass);
+        
+        // Act
+        var result = await _handler.Handle(command, default);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+    }
+
+    [Fact]
+    public async Task Handle_ShouldReturnSuccess_WhenUpdatingSubjectOnly()
+    {
+        // Arrange
+        var allocation = Allocation.Create(Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid()).Value;
+        var newSubjectId = Guid.NewGuid();
+        var command = new UpdateAllocationCommand(Guid.NewGuid(), allocation.TeacherId, allocation.ClassId, newSubjectId);
+        var newSubject = Subject.Create("S").Value;
+
+        _allocationRepositoryMock.GetByIdAsync(command.AllocationId, Arg.Any<CancellationToken>()).Returns(allocation);
+        _subjectRepositoryMock.GetByIdAsync(newSubjectId, Arg.Any<CancellationToken>()).Returns(newSubject);
+        
+        // Act
+        var result = await _handler.Handle(command, default);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+    }
+
+    [Fact]
+    public async Task Handle_ShouldReturnFailure_WhenDomainUpdateFails()
+    {
+        // Arrange
+        var allocation = Allocation.Create(Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid()).Value;
+        var command = new UpdateAllocationCommand(Guid.NewGuid(), Guid.Empty, allocation.ClassId, allocation.SubjectId);
+        
+        var teacher = User.Create("teacher", "hash", "Teacher", UserRole.Teacher).Value;
+
+        _allocationRepositoryMock.GetByIdAsync(command.AllocationId, Arg.Any<CancellationToken>())
+            .Returns(allocation);
+        _userRepositoryMock.GetByIdAsync(command.TeacherId, Arg.Any<CancellationToken>())
+            .Returns(teacher);
+
+        // Act
+        var result = await _handler.Handle(command, default);
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Error.Should().Be(DomainErrors.Allocation.EmptyTeacherId);
+    }
 }

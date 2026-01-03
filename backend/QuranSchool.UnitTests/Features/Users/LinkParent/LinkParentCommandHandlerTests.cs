@@ -80,4 +80,21 @@ public class LinkParentCommandHandlerTests
         result.IsSuccess.Should().BeTrue();
         await _userRepositoryMock.Received(1).AddParentStudentLinkAsync(Arg.Any<ParentStudent>(), Arg.Any<CancellationToken>());
     }
+
+    [Fact]
+    public async Task Handle_ShouldReturnFailure_WhenDomainLinkCreationFails()
+    {
+        var command = new LinkParentCommand(Guid.Empty, Guid.NewGuid());
+        var parent = User.Create("p", "p", "P", UserRole.Parent).Value;
+        var student = User.Create("s", "s", "S", UserRole.Student).Value;
+        
+        _userRepositoryMock.GetByIdAsync(command.ParentId).Returns(parent);
+        _userRepositoryMock.GetByIdAsync(command.StudentId).Returns(student);
+        _userRepositoryMock.IsParentLinkedAsync(command.ParentId, command.StudentId).Returns(false);
+
+        var result = await _handler.Handle(command, default);
+
+        result.IsFailure.Should().BeTrue();
+        result.Error.Should().Be(DomainErrors.User.EmptyParentId);
+    }
 }

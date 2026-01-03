@@ -79,4 +79,24 @@ public class UpdateSubjectCommandHandlerTests
         result.IsSuccess.Should().BeTrue();
         await _subjectRepositoryMock.Received(1).UpdateAsync(Arg.Is<Subject>(s => s.Name == command.Name), Arg.Any<CancellationToken>());
     }
+
+    [Fact]
+    public async Task Handle_ShouldReturnFailure_WhenDomainUpdateFails()
+    {
+        // Arrange
+        var command = new UpdateSubjectCommand(Guid.NewGuid(), ""); // Empty Name
+        var existingSubject = Subject.Create("Old Name").Value;
+        
+        _subjectRepositoryMock.GetByIdAsync(command.SubjectId, Arg.Any<CancellationToken>())
+            .Returns(existingSubject);
+        _subjectRepositoryMock.ExistsAsync(command.Name, Arg.Any<CancellationToken>())
+            .Returns(false);
+
+        // Act
+        var result = await _handler.Handle(command, default);
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Error.Should().Be(DomainErrors.Subject.EmptyName);
+    }
 }

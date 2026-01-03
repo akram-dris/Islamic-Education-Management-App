@@ -59,4 +59,21 @@ public class RegisterUserCommandHandlerTests
         result.IsSuccess.Should().BeTrue();
         await _userRepositoryMock.Received(1).AddAsync(Arg.Any<User>(), Arg.Any<CancellationToken>());
     }
+
+    [Fact]
+    public async Task Handle_ShouldReturnFailure_WhenDomainCreationFails()
+    {
+        // Arrange
+        var command = new RegisterUserCommand("", "password", "Test User", UserRole.Student);
+        
+        _userRepositoryMock.GetByUsernameAsync(command.Username, Arg.Any<CancellationToken>())
+            .Returns((User?)null);
+
+        // Act
+        var result = await _handler.Handle(command, default);
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Error.Should().Be(DomainErrors.User.EmptyUsername);
+    }
 }
