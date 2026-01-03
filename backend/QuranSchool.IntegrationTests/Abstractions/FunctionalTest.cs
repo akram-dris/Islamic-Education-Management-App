@@ -1,4 +1,5 @@
 using System.Net.Http.Json;
+using System.Linq;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -23,6 +24,10 @@ public abstract class FunctionalTest : IAsyncLifetime
 
     public async Task InitializeAsync()
     {
+        // Disable file watching to avoid inotify exhaustion
+        Environment.SetEnvironmentVariable("DOTNET_USE_POLLING_FILE_WATCHER", "1");
+        Environment.SetEnvironmentVariable("ASPNETCORE_hostBuilder:reloadConfigOnChange", "false");
+
         // Environment variables should be provided by the test runner or .env
         await _dbContainer.StartAsync();
 
@@ -34,6 +39,11 @@ public abstract class FunctionalTest : IAsyncLifetime
             {
                 builder.ConfigureAppConfiguration((context, config) =>
                 {
+                    foreach (var source in config.Sources.OfType<Microsoft.Extensions.Configuration.Json.JsonConfigurationSource>())
+                    {
+                        source.ReloadOnChange = false;
+                    }
+
                     config.AddInMemoryCollection(new Dictionary<string, string?>
                     {
                         ["DEFAULT_CONNECTION"] = _dbContainer.GetConnectionString(),
