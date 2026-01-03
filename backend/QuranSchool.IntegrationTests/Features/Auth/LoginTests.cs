@@ -26,6 +26,19 @@ public class LoginTests : FunctionalTest
     }
 
     [Fact]
+    public async Task Login_ShouldReturnBadRequest_WhenUsernameIsEmpty()
+    {
+        // Arrange
+        var command = new LoginCommand("", "password");
+
+        // Act
+        var response = await HttpClient.PostAsJsonAsync("api/auth/login", command);
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+    }
+
+    [Fact]
     public async Task Login_ShouldReturnUnauthorized_WhenCredentialsAreInvalid()
     {
         // Arrange

@@ -1,4 +1,5 @@
 using FluentAssertions;
+using Microsoft.EntityFrameworkCore;
 using Xunit;
 using QuranSchool.Domain.Entities;
 using QuranSchool.Domain.Enums;
@@ -60,10 +61,12 @@ public class UserRepositoryTests : BaseIntegrationTest
         await repository.DeleteAsync(user);
 
         var result = await repository.GetByIdAsync(user.Id);
-        result.Should().BeNull(); // Repository should filter deleted users in GetById if implemented
+        result.Should().BeNull();
         
-        // Actually Repository GetByIdAsync usually filters IsDeleted if following the pattern.
-        // Let's check DB directly if repo filters it.
+        var deletedUser = await DbContext.Users
+            .IgnoreQueryFilters()
+            .FirstOrDefaultAsync(u => u.Id == user.Id);
+        deletedUser!.IsDeleted.Should().BeTrue();
     }
 
     [Fact]
@@ -123,5 +126,13 @@ public class UserRepositoryTests : BaseIntegrationTest
         var result = await repository.GetPagedAsync("Paged User", UserRole.Student, 1, 10);
 
         result.Items.Should().Contain(u => u.Id == user.Id);
+    }
+
+    [Fact]
+    public async Task GetPagedAsync_ShouldReturnAllUsers_WhenParametersAreNull()
+    {
+        var repository = new UserRepository(DbContext);
+        var result = await repository.GetPagedAsync(null, null, 1, 10);
+        result.Should().NotBeNull();
     }
 }

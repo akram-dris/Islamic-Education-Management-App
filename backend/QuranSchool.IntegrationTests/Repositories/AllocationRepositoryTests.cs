@@ -106,4 +106,31 @@ public class AllocationRepositoryTests : BaseIntegrationTest
         var result = await allocationRepo.GetByIdAsync(allocation.Id);
         result.Should().BeNull();
     }
+
+    [Fact]
+    public async Task GetAllAsync_ShouldReturnAllAllocations()
+    {
+        var allocationRepo = new AllocationRepository(DbContext);
+        var result = await allocationRepo.GetAllAsync();
+        result.Should().NotBeNull();
+    }
+
+    [Fact]
+    public async Task GetByTeacherIdAsync_ShouldReturnAllocationsForTeacher()
+    {
+        var allocationRepo = new AllocationRepository(DbContext);
+        var teacher = User.Create("teacher_list", "hash", "Teacher", UserRole.Teacher).Value;
+        await new UserRepository(DbContext).AddAsync(teacher);
+        
+        var result = await allocationRepo.GetByTeacherIdAsync(teacher.Id);
+        result.Should().NotBeNull();
+    }
+
+    [Fact]
+    public async Task ExistsAsync_ShouldReturnFalse_WhenNotExists()
+    {
+        var allocationRepo = new AllocationRepository(DbContext);
+        var exists = await allocationRepo.ExistsAsync(Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid());
+        exists.Should().BeFalse();
+    }
 }

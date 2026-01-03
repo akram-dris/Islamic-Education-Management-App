@@ -34,6 +34,14 @@ public class SubjectRepositoryTests : BaseIntegrationTest
     }
 
     [Fact]
+    public async Task ExistsAsync_ShouldReturnFalse_WhenNotExists()
+    {
+        var repo = new SubjectRepository(DbContext);
+        var result = await repo.ExistsAsync("NotExists");
+        result.Should().BeFalse();
+    }
+
+    [Fact]
     public async Task GetAllAsync_ShouldReturnAllSubjects()
     {
         var repo = new SubjectRepository(DbContext);
@@ -43,5 +51,33 @@ public class SubjectRepositoryTests : BaseIntegrationTest
         var result = await repo.GetAllAsync();
 
         result.Should().HaveCountGreaterOrEqualTo(2);
+    }
+
+    [Fact]
+    public async Task UpdateAsync_ShouldUpdateName()
+    {
+        var repo = new SubjectRepository(DbContext);
+        var subject = Subject.Create("Old").Value;
+        await repo.AddAsync(subject);
+
+        subject.Update("New");
+        await repo.UpdateAsync(subject);
+
+        var result = await repo.GetByIdAsync(subject.Id);
+        result!.Name.Should().Be("New");
+    }
+
+    [Fact]
+    public async Task DeleteAsync_ShouldRemoveSubject()
+    {
+        var repo = new SubjectRepository(DbContext);
+        var subject = Subject.Create("Del").Value;
+        await repo.AddAsync(subject);
+
+        await repo.DeleteAsync(subject);
+
+        var result = await repo.GetByIdAsync(subject.Id);
+        result.Should().NotBeNull();
+        result!.IsDeleted.Should().BeTrue();
     }
 }

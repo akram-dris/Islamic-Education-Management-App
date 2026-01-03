@@ -27,6 +27,7 @@ public abstract class FunctionalTest : IAsyncLifetime
         await _dbContainer.StartAsync();
 
         Environment.SetEnvironmentVariable("DEFAULT_CONNECTION", _dbContainer.GetConnectionString());
+        Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", "Development");
 
         var factory = new WebApplicationFactory<Program>()
             .WithWebHostBuilder(builder =>

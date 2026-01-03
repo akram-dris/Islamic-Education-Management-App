@@ -1,4 +1,5 @@
 using FluentAssertions;
+using Microsoft.EntityFrameworkCore;
 using Xunit;
 using QuranSchool.Domain.Entities;
 using QuranSchool.Domain.Enums;
@@ -50,6 +51,11 @@ public class AssignmentRepositoryTests : BaseIntegrationTest
 
         var result = await assignmentRepo.GetByIdAsync(assignment.Id);
         result.Should().BeNull();
+
+        var deletedAssignment = await DbContext.Assignments
+            .IgnoreQueryFilters()
+            .FirstOrDefaultAsync(a => a.Id == assignment.Id);
+        deletedAssignment!.IsDeleted.Should().BeTrue();
     }
 
     [Fact]
@@ -61,6 +67,19 @@ public class AssignmentRepositoryTests : BaseIntegrationTest
         await assignmentRepo.AddAsync(assignment);
 
         var result = await assignmentRepo.GetByClassIdAsync(allocation.ClassId);
+
+        result.Should().Contain(a => a.Id == assignment.Id);
+    }
+
+    [Fact]
+    public async Task GetByAllocationIdAsync_ShouldReturnAssignments()
+    {
+        var assignmentRepo = new AssignmentRepository(DbContext);
+        var allocation = await CreateAllocation();
+        var assignment = Assignment.Create(allocation.Id, "T", "D", DateOnly.FromDateTime(DateTime.Now)).Value;
+        await assignmentRepo.AddAsync(assignment);
+
+        var result = await assignmentRepo.GetByAllocationIdAsync(allocation.Id);
 
         result.Should().Contain(a => a.Id == assignment.Id);
     }

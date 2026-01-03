@@ -1,4 +1,5 @@
 using FluentAssertions;
+using Microsoft.EntityFrameworkCore;
 using Xunit;
 using QuranSchool.Domain.Entities;
 using QuranSchool.Domain.Enums;
@@ -50,6 +51,64 @@ public class SubmissionRepositoryTests : BaseIntegrationTest
         var result = await repo.GetByAssignmentIdAsync(assignment.Id);
 
         result.Should().Contain(s => s.Id == submission.Id);
+    }
+
+    [Fact]
+    public async Task UpdateAsync_ShouldUpdateSubmission()
+    {
+        var repo = new SubmissionRepository(DbContext);
+        var assignment = await CreateAssignment();
+        var student = await CreateStudent();
+        var submission = Submission.Create(assignment.Id, student.Id, "url").Value;
+        await repo.AddAsync(submission);
+
+        submission.GradeSubmission(100, "Excellent");
+        await repo.UpdateAsync(submission);
+
+        var result = await repo.GetByIdAsync(submission.Id);
+        result!.Grade.Should().Be(100);
+    }
+
+    [Fact]
+    public async Task DeleteAsync_ShouldRemoveSubmission()
+    {
+        var repo = new SubmissionRepository(DbContext);
+        var assignment = await CreateAssignment();
+        var student = await CreateStudent();
+        var submission = Submission.Create(assignment.Id, student.Id, "url").Value;
+        await repo.AddAsync(submission);
+
+        await repo.DeleteAsync(submission);
+
+        var result = await repo.GetByIdAsync(submission.Id);
+        result.Should().BeNull();
+
+        var deletedSubmission = await DbContext.Submissions
+            .IgnoreQueryFilters()
+            .FirstOrDefaultAsync(s => s.Id == submission.Id);
+        deletedSubmission!.IsDeleted.Should().BeTrue();
+    }
+
+    [Fact]
+    public async Task GetByStudentAndAssignmentAsync_ShouldReturnSubmission()
+    {
+        var repo = new SubmissionRepository(DbContext);
+        var assignment = await CreateAssignment();
+        var student = await CreateStudent();
+        var submission = Submission.Create(assignment.Id, student.Id, "url").Value;
+        await repo.AddAsync(submission);
+
+        var result = await repo.GetByStudentAndAssignmentAsync(student.Id, assignment.Id);
+        result.Should().NotBeNull();
+        result!.Id.Should().Be(submission.Id);
+    }
+
+    [Fact]
+    public async Task ExistsAsync_ShouldReturnFalse_WhenNotExists()
+    {
+        var repo = new SubmissionRepository(DbContext);
+        var result = await repo.ExistsAsync(Guid.NewGuid(), Guid.NewGuid());
+        result.Should().BeFalse();
     }
 
     private async Task<Assignment> CreateAssignment()
