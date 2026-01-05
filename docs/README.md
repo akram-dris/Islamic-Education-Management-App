@@ -1,6 +1,6 @@
 # 📚 Project Documentation
 
-This folder contains the comprehensive documentation for the Islamic Education Management System. It serves as the single source of truth for requirements, architecture, and specifications.
+This folder contains the comprehensive documentation for the Education Management Assahaba. It serves as the single source of truth for requirements, architecture, and specifications.
 
 ## 📁 Document Index
 

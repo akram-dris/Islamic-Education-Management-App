@@ -1,4 +1,4 @@
-# 🕌 Islamic Education Management System (IEMS)
+# 🕌 Education Management Assahaba
 
 [![.NET 10](https://img.shields.io/badge/.NET-10.0-blue.svg)](https://dotnet.microsoft.com/download/dotnet/10.0)
 [![Architecture](https://img.shields.io/badge/Architecture-Clean%20Architecture-green.svg)](docs/backend_architecture.md)
@@ -9,7 +9,7 @@ A modern, robust, and secure management platform designed specifically for Quran
 
 ## 🚀 Overview
 
-IEMS provides a unified ecosystem to manage the complexities of educational allocations, assignment tracking, and attendance monitoring, all while adhering to industry-standard architectural patterns.
+Education Management Assahaba provides a unified ecosystem to manage the complexities of educational allocations, assignment tracking, and attendance monitoring, all while adhering to industry-standard architectural patterns.
 
 ### 🎭 Key Personas
 *   **Admins**: Full control over academic structure, users, and allocations.
@@ -52,8 +52,8 @@ IEMS provides a unified ecosystem to manage the complexities of educational allo
 ### Quick Start
 1.  **Clone & Navigate**
     ```bash
-    git clone https://github.com/akram-dris/Islamic-Education-Management-App.git
-    cd Islamic-Education-Management-App
+    git clone https://github.com/akram-dris/Education-Management-Assahaba.git
+    cd Education-Management-Assahaba
     ```
 2.  **Start Database**
     ```bash

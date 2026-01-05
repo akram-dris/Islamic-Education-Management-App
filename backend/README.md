@@ -1,6 +1,6 @@
-# ⚙️ IEMS Backend
+# ⚙️ Education Management Assahaba Backend
 
-This directory contains the core logic of the Islamic Education Management System, built with **.NET 10** following **Clean Architecture** principles.
+This directory contains the core logic of the Education Management Assahaba, built with **.NET 10** following **Clean Architecture** principles.
 
 ## 🏗️ Architecture
 
